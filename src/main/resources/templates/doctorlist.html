@@ -39,24 +39,24 @@
 <tbody>
 
 <tr valign="top" th:each="doctor:${doctor}">
-<form method="POST" th:action="@{/assignment}">
-<td valign="top" th:text="${doctor.email}"type="text">Email</td>
-<td valign="top" th:text="${doctor.name}">Name</td>
-<td valign="top" th:text="${doctor.specialization}">Specialization</td>
-<td valign="top" th:text="${doctor.degree}">Degree</td>
-<td valign="top" th:text="${doctor.state}">State</td>
-<td valign="top" th:text="${doctor.city}">City</td>
-<td>
+<!--<form method="POST" th:action="@{/assignment}">-->
+<!--<td valign="top" th:text="${doctor.email}"type="text">Email</td>-->
+<!--<td valign="top" th:text="${doctor.name}">Name</td>-->
+<!--<td valign="top" th:text="${doctor.specialization}">Specialization</td>-->
+<!--<td valign="top" th:text="${doctor.degree}">Degree</td>-->
+<!--<td valign="top" th:text="${doctor.state}">State</td>-->
+<!--<td valign="top" th:text="${doctor.city}">City</td>-->
+<!--<td>-->
 
-	<input type="hidden" name="email" th:value="${email}">
-	
-	<input type="hidden" name="docId" th:value="${doctor.email}">
-	<input type="hidden" name="docName" th:value="${doctor.name}">
-	<input type="hidden" name="docSpecial" th:value="${doctor.specialization}">
-	<input type="date" id="calender" name="date">
-    <button type="submit" value="value" class="link-button">Book Appointment</button>
-</td>
-</form>
+<!--	<input type="hidden" name="email" th:value="${email}">-->
+<!--	-->
+<!--	<input type="hidden" name="docId" th:value="${doctor.email}">-->
+<!--	<input type="hidden" name="docName" th:value="${doctor.name}">-->
+<!--	<input type="hidden" name="docSpecial" th:value="${doctor.specialization}">-->
+<!--	<input type="date" id="calender" name="date">-->
+<!--    <button type="submit" value="value" class="link-button">Book Appointment</button>-->
+<!--</td>-->
+<!--</form>-->
 </tr>
 
 </tbody>

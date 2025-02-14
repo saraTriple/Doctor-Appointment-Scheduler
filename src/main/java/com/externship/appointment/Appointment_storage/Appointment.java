@@ -1,72 +1,86 @@
 package com.externship.appointment.Appointment_storage;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import com.externship.appointment.Doctor_storage.Doctor;
+import com.externship.appointment.Person_storage.Person;
 
-import org.springframework.stereotype.Component;
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-@Component
 @Entity
 public class Appointment {
 	@Id
-	private String appId;
-	private String email;
-	private String docId;
-	private String docName;
-	private String docSpecial;
-	private String status;
-	private String date;
-//	private String slot;
-	// Doctor ID	Doctor's Name	Specialization	Appointment Time	Appointment Date	Status
-	public String getEmail() {
-		return email;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private LocalDate date;
+	private LocalTime time;
+	private double price;
+
+	@ManyToOne
+	@JoinColumn(name = "person_id", nullable = false)  // Foreign key to Person
+	private Person person;
+
+	@ManyToOne
+	@JoinColumn(name = "doctor_id", nullable = false)  // Foreign key to Doctor
+	private Doctor doctor;
+
+	private String status;  // Appointment status (e.g., Scheduled, Completed, Canceled)
+
+	// Getters and Setters
+	public Long getId() {
+		return id;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+
+	public void setId(Long id) {
+		this.id = id;
 	}
-	public String getDocId() {
-		return docId;
-	}
-	public void setDocId(String docId) {
-		this.docId = docId;
-	}
-	public String getDate() {
+
+	public LocalDate getDate() {
 		return date;
 	}
-	public void setDate(String date) {
+
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
-//	public String getSlot() {
-//		return slot;
-//	}
-//	public void setSlot(String slot) {
-//		this.slot = slot;
-//	}
-	public String getAppId() {
-		return appId;
+
+	public LocalTime getTime() {
+		return time;
 	}
-	public void setAppId(int count) {
-		this.appId = Integer.toString(count);
+
+	public void setTime(LocalTime time) {
+		this.time = time;
 	}
-	public String getDocName() {
-		return docName;
+
+	public double getPrice() {
+		return price;
 	}
-	public void setDocName(String docName) {
-		this.docName = docName;
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
-	public String getDocSpecial() {
-		return docSpecial;
+
+	public Person getPerson() {
+		return person;
 	}
-	public void setDocSpecial(String docSpecial) {
-		this.docSpecial = docSpecial;
+
+	public void setPerson(Person person) {
+		this.person = person;
 	}
+
+	public Doctor getDoctor() {
+		return doctor;
+	}
+
+	public void setDoctor(Doctor doctor) {
+		this.doctor = doctor;
+	}
+
 	public String getStatus() {
 		return status;
 	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-
-
 }

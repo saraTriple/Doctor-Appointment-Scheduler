@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import com.externship.appointment.Appointment_storage.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,8 @@ public class ControllerClass {
 	
 	@Autowired
 	AppointmentRepository appRepo;
+	@Autowired
+	AppointmentService appointmentService;
 	
 	@GetMapping("/register")
 	public String register() {
@@ -121,17 +124,12 @@ public class ControllerClass {
 
 
 	
-	@PostMapping("/assignment")
-	public String submitted(Appointment app) {
-		app.setAppId(count++);
-		app.setStatus("Active");
-		appRepo.save(app);
-		
-//		System.out.println(app.getEmail());
-//		System.out.println(app.getDate());
-//		System.out.println(docRepo.findById(app.getDocId()).get(0).getName());
-		return "redirect:/docdetails";
-	}
+//	@PostMapping("/assignment")
+//	public String submitted(Appointment app) {
+//		app.setStatus("Active");
+//		appRepo.save(app);
+//		return "redirect:/docdetails";
+//	}
 	
 	@GetMapping("/docdetails")
 	public ModelAndView DocDetails(HttpSession session) {
@@ -148,7 +146,7 @@ public class ControllerClass {
 	
 	@GetMapping("/userdetails")
 	public ModelAndView UserDetails(HttpSession session) {
-		List<Appointment> apps = appRepo.findAllByEmail(session.getAttribute("person").toString());
+		List<Appointment> apps = appointmentService.findByPesonId(session.getAttribute("person").toString());
 		Map<String,Object> params = new HashMap<>();
 		
 		params.put("appointments", apps);
@@ -160,7 +158,7 @@ public class ControllerClass {
 	}
 	@GetMapping("/patientlist")
 	public ModelAndView PatientList(HttpSession session) {
-		List<Appointment> apps = appRepo.findByDocId(session.getAttribute("doctor").toString());
+		List<Appointment> apps = appRepo.findByDoctor(session.getAttribute("doctor").toString());
 		Map<String,Object> params = new HashMap<>();
 		
 		params.put("appointments", apps);

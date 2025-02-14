@@ -1,9 +1,11 @@
 package com.externship.appointment.Appointment_storage;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
-public interface AppointmentRepository extends CrudRepository<Appointment,String>,CustomRepository,CustomTwo{
+import java.util.List;
 
-	
+public interface AppointmentRepository extends JpaRepository<Appointment,String>,CustomTwo{
+
 	
 }

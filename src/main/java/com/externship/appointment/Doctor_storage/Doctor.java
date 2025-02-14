@@ -21,7 +21,19 @@ public class Doctor {
 	private String city;
 	
 	private String password;
-	
+
+	public Doctor() {
+	}
+
+	public Doctor(String email, String name, String specialization, String degree, String state, String city, String password) {
+		this.email = email;
+		this.name = name;
+		this.specialization = specialization;
+		this.degree = degree;
+		this.state = state;
+		this.city = city;
+		this.password = password;
+	}
 
 
 	public String getEmail() {
