@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Appointments List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script>
+        function filterAppointments() {
+            let inputDate = document.getElementById("filterDate").value.toLowerCase();
+            let inputTime = document.getElementById("filterTime").value.toLowerCase();
+            let inputDoctor = document.getElementById("filterDoctor").value.toLowerCase();
+            let inputSpecialization = document.getElementById("filterSpecialization").value.toLowerCase();
+            let inputStatus = document.getElementById("filterStatus").value.toLowerCase();
+
+            let table = document.getElementById("appointmentsTable");
+            let rows = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < rows.length; i++) {
+                let date = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
+                let time = rows[i].getElementsByTagName("td")[2].innerText.toLowerCase();
+                let doctor = rows[i].getElementsByTagName("td")[3].innerText.toLowerCase();
+                let specialization = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
+                let status = rows[i].getElementsByTagName("td")[5].innerText.toLowerCase();
+
+                if ((date.includes(inputDate) || inputDate === "") &&
+                    (time.includes(inputTime) || inputTime === "") &&
+                    (doctor.includes(inputDoctor) || inputDoctor === "") &&
+                    (specialization.includes(inputSpecialization) || inputSpecialization === "") &&
+                    (status.includes(inputStatus) || inputStatus === "")) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand text-capitalize" href="#">
+            <img src="../../sign.jpg" width="40" height="40" alt="logo" loading="lazy" class="mr-2">
+            Admin Dashboard
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/home}">
+                        <i class="fa fa-home mr-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/doctors}">
+                        <i class="fa fa-user-md mr-1"></i> Doctors List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/patients}">
+                        <i class="fa fa-user-md mr-1"></i> Patients List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/appointments}">
+                        <i class="fa fa-calendar-check mr-1"></i> Appointments List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger font-weight-bold" th:href="@{/logout}">
+                        <i class="fa fa-sign-out-alt mr-1"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-5">
+    <h2 class="text-center">Appointments List</h2>
+
+    <!-- Appointment Filtering -->
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <input type="date" id="filterDate" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Date">
+        </div>
+        <div class="col-md-2">
+            <input type="time" id="filterTime" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Time">
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="filterDoctor" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Doctor Name">
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="filterSpecialization" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Specialization">
+        </div>
+        <div class="col-md-2">
+            <select id="filterStatus" class="form-control" onchange="filterAppointments()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- List of Appointments -->
+    <table class="table table-bordered" id="appointmentsTable">
+        <thead class="thead-dark">
+        <tr>
+            <th>Appointment ID</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Doctor Name</th>
+            <th>Specialization</th>
+            <th>Status</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="appointment : ${appointments}">
+            <td th:text="${appointment.id}"></td>
+            <td th:text="${appointment.date}"></td>
+            <td th:text="${appointment.time}"></td>
+            <td th:text="${appointment.doctorId}"></td>
+            <td th:text="${appointment.docSpecial}"></td>
+            <td th:text="${appointment.status}"></td>
+            <td th:text="${appointment.price}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

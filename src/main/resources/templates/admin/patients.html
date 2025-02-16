@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patients List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand text-capitalize" href="#">
+            <img src="../../sign.jpg" width="40" height="40" alt="logo" loading="lazy" class="mr-2">
+            Admin Dashboard
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/home}">
+                        <i class="fa fa-home mr-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/doctors}">
+                        <i class="fa fa-user-md mr-1"></i> Doctors List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/patients}">
+                        <i class="fa fa-user-md mr-1"></i> Patients List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/appointments}">
+                        <i class="fa fa-calendar-check mr-1"></i> Appointments List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger font-weight-bold" th:href="@{/logout}">
+                        <i class="fa fa-sign-out-alt mr-1"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-5">
+    <h2 class="text-center">Patients List</h2>
+
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Gender</th>
+            <th>Date of Birth</th>
+            <th>Phone Number</th>
+            <th>Address</th>
+            <th>Insurance Provider</th>
+            <th>Insurance Policy Number</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="patient : ${patients}">
+            <td th:text="${patient.email}"></td>
+            <td th:text="${patient.firstName}"></td>
+            <td th:text="${patient.lastName}"></td>
+            <td th:text="${patient.gender}"></td>
+            <td th:text="${patient.dateOfBirth}"></td>
+            <td th:text="${patient.phoneNumber}"></td>
+            <td th:text="${patient.address}"></td>
+            <td th:text="${patient.insuranceProvider}"></td>
+            <td th:text="${patient.insurancePolicyNumber}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -17,9 +17,9 @@
             </select>
         </div>
 
-        <!-- Select Patient -->
+        <!-- Select Person -->
         <div class="form-group">
-            <label for="person">Select Patient:</label>
+            <label for="person">Select Person:</label>
             <select id="person" th:field="*{person}" class="form-control" required>
                 <option th:each="person : ${patients}" th:value="${person.id}" th:text="${person.name}"></option>
             </select>

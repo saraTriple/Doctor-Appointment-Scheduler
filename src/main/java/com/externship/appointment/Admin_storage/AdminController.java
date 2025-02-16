@@ -1,64 +1,88 @@
 package com.externship.appointment.Admin_storage;
 
+
 import com.externship.appointment.Appointment_storage.Appointment;
-import com.externship.appointment.Appointment_storage.AppointmentService;
+import com.externship.appointment.Appointment_storage.AppointmentRepository;
 import com.externship.appointment.Doctor_storage.Doctor;
 import com.externship.appointment.Doctor_storage.DoctorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.externship.appointment.Person_storage.Patient;
+import com.externship.appointment.Person_storage.PatientRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.servlet.ModelAndView;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
 public class AdminController {
-    @Autowired
-    private AdminService adminService;
-    @Autowired
-    private AppointmentService appointmentService;
-    @Autowired
-    private DoctorRepository doctorRepository;
 
-    @GetMapping("/admin/login")
-    public String showLoginPage() {
-        return "admin-login";
+    private final DoctorRepository docRepo;
+    private final AppointmentRepository appRepo;
+    private final PatientRepository personRepository;
+
+    public AdminController(DoctorRepository docRepo, AppointmentRepository appRepo, PatientRepository personRepository) {
+        this.docRepo = docRepo;
+        this.appRepo = appRepo;
+        this.personRepository = personRepository;
     }
 
-    @PostMapping("/admin/login")
-    public String login(@RequestParam String username, @RequestParam String password, Model model) {
-        Admin admin = adminService.findByUsername(username);
-        if (admin != null && admin.getPassword().equals(password)) {
-            return "redirect:/admin/dashboard";
-        }
-        model.addAttribute("error", "Invalid username or password");
-        return "admin-login";
-    }
-
+    // Main Admin Dashboard
     @GetMapping("/admin/dashboard")
-    public String showDashboard(Model model) {
-        List<Doctor> doctors = doctorRepository.findAll(); // Fetch all doctors
-        List<Appointment> appointments = appointmentService.getAllAppointments(); // Fetch all appointments
+    public ModelAndView adminDashboard(HttpSession session) {
+        // Check if admin is logged in
+        if (session.getAttribute("admin") == null) {
+            return new ModelAndView("redirect:/fail_login");
+        }
 
-        model.addAttribute("doctors", doctors);
-        model.addAttribute("appointments", appointments);
-
-        return "admin-dashboard";
+        ModelAndView modelAndView = new ModelAndView("admin/admin-dashboard");
+        return modelAndView;
     }
 
+    @GetMapping("/admin/home")
+    public ModelAndView adminDashboardHome(HttpSession session) {
 
+        ModelAndView modelAndView = new ModelAndView("admin/home");
+        return modelAndView;
+    }
+
+    // Doctors List Page
+    @GetMapping("/admin/doctors")
+    public ModelAndView doctorsList(HttpSession session) {
+        // Check if admin is logged in
+        if (session.getAttribute("admin") == null) {
+            return new ModelAndView("redirect:/fail_login");
+        }
+
+        List<Doctor> doctors = docRepo.findAll();
+        ModelAndView modelAndView = new ModelAndView("admin/doctors");
+        modelAndView.addObject("doctors", doctors);
+        return modelAndView;
+    }
+
+    @GetMapping("/admin/patients")
+    public ModelAndView patientsList(HttpSession session) {
+        // Check if admin is logged in
+        if (session.getAttribute("admin") == null) {
+            return new ModelAndView("redirect:/fail_login");
+        }
+
+        List<Patient> patients = personRepository.findAll();
+        ModelAndView modelAndView = new ModelAndView("admin/patients");
+        modelAndView.addObject("patients", patients);
+        return modelAndView;
+    }
+
+    // Appointments List Page
     @GetMapping("/admin/appointments")
-    public String showAppointmentForm(Model model) {
-        model.addAttribute("appointment", new Appointment());
-        return "admin-appointment";
-    }
+    public ModelAndView appointmentsList(HttpSession session) {
+        // Check if admin is logged in
+        if (session.getAttribute("admin") == null) {
+            return new ModelAndView("redirect:/fail_login");
+        }
 
-    @PostMapping("/admin/appointments")
-    public String createAppointment(@ModelAttribute Appointment appointment) {
-        appointmentService.createAppointment(appointment);
-        return "redirect:/admin/dashboard";
+        List<Appointment> appointments = appRepo.findAll();
+        ModelAndView modelAndView = new ModelAndView("admin/appointments");
+        modelAndView.addObject("appointments", appointments);
+        return modelAndView;
     }
 }

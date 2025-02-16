@@ -1,7 +1,7 @@
 package com.externship.appointment.Appointment_storage;
 
 import com.externship.appointment.Doctor_storage.Doctor;
-import com.externship.appointment.Person_storage.Person;
+import com.externship.appointment.Person_storage.Patient;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -18,8 +18,8 @@ public class Appointment {
 	private double price;
 
 	@ManyToOne
-	@JoinColumn(name = "person_id", nullable = false)  // Foreign key to Person
-	private Person person;
+	@JoinColumn(name = "patient_id", nullable = false)  // Foreign key to Person
+	private Patient person;
 
 	@ManyToOne
 	@JoinColumn(name = "doctor_id", nullable = false)  // Foreign key to Doctor
@@ -60,11 +60,11 @@ public class Appointment {
 		this.price = price;
 	}
 
-	public Person getPerson() {
+	public Patient getPerson() {
 		return person;
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(Patient person) {
 		this.person = person;
 	}
 
