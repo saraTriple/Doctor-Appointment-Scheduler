@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Doctor's Patients</title>
+    <title>Doctor's Appointments</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -37,7 +37,7 @@
     <div class="container mt-5">
         <div class="row mb-4">
             <div class="col">
-                <h2><i class="fa fa-users"></i> My Patients</h2>
+                <h2><i class="fa fa-calendar"></i> My Appointments</h2>
             </div>
         </div>
         
@@ -46,23 +46,26 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th><i class="fa fa-user"></i> Name</th>
-                            <th><i class="fa fa-envelope"></i> Email</th>
-                            <th><i class="fa fa-phone"></i> Phone</th>
-                            <th><i class="fa fa-calendar"></i> Last Appointment</th>
+                            <th><i class="fa fa-calendar"></i> Date</th>
+                            <th><i class="fa fa-clock-o"></i> Time</th>
+                            <th><i class="fa fa-user"></i> Patient Name</th>
+                            <th><i class="fa fa-info-circle"></i> Status</th>
                             <th><i class="fa fa-cogs"></i> Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="patient : ${patients}">
-                            <td th:text="${patient.firstName + ' ' + patient.lastName}"></td>
-                            <td th:text="${patient.email}"></td>
-                            <td th:text="${patient.phoneNumber}"></td>
-                            <td th:text="${patient.lastAppointment}"></td>
+                        <tr th:each="appointment : ${appointments}">
+                            <td th:text="${appointment.date}"></td>
+                            <td th:text="${appointment.time}"></td>
+                            <td th:text="${appointment.patientName}"></td>
+                            <td th:text="${appointment.status}"></td>
                             <td>
-                                <a th:href="@{'/doctor/patient/' + ${patient.email}}" class="btn btn-sm btn-info">
-                                    <i class="fa fa-eye"></i> View Details
-                                </a>
+                                <a th:href="@{'/doctor/appointment/' + ${appointment.id}}" class="btn btn-sm btn-info">View</a>
+                                <button th:if="${appointment.status == 'SCHEDULED'}"
+                                        th:onclick="'completeAppointment(' + ${appointment.id} + ')'"
+                                        class="btn btn-sm btn-success">
+                                    <i class="fa fa-check"></i> Complete
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -74,5 +77,19 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        function completeAppointment(id) {
+            if (confirm('Are you sure you want to mark this appointment as completed?')) {
+                $.post('/doctor/appointments/' + id + '/complete', function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to complete appointment');
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>

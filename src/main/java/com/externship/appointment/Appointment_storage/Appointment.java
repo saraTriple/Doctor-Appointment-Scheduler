@@ -2,6 +2,7 @@ package com.externship.appointment.Appointment_storage;
 
 import com.externship.appointment.Doctor_storage.Doctor;
 import com.externship.appointment.Person_storage.Patient;
+import com.externship.appointment.Appointment_storage.AppointmentStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -18,14 +19,16 @@ public class Appointment {
 	private double price;
 
 	@ManyToOne
-	@JoinColumn(name = "patient_id", nullable = false)  // Foreign key to Person
+	@JoinColumn(name = "patient_id", nullable = true)  // Foreign key to Person
 	private Patient person;
 
 	@ManyToOne
 	@JoinColumn(name = "doctor_id", nullable = false)  // Foreign key to Doctor
 	private Doctor doctor;
 
-	private String status;  // Appointment status (e.g., Scheduled, Completed, Canceled)
+	@ManyToOne
+	@JoinColumn(name = "status_id", nullable = false)  // Foreign key to AppointmentStatus
+	private AppointmentStatus appointmentStatus;
 
 	// Getters and Setters
 	public Long getId() {
@@ -76,11 +79,11 @@ public class Appointment {
 		this.doctor = doctor;
 	}
 
-	public String getStatus() {
-		return status;
+	public AppointmentStatus getAppointmentStatus() {
+		return appointmentStatus;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setAppointmentStatus(AppointmentStatus appointmentStatus) {
+		this.appointmentStatus = appointmentStatus;
 	}
 }

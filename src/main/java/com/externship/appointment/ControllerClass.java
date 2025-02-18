@@ -100,7 +100,7 @@ public class ControllerClass {
     public String authenticatedoc(Doctor doctor, HttpSession session) {
         if (docRepo.existsById(doctor.getEmail()) && docRepo.findById(doctor.getEmail()).get().getPassword().equals(doctor.getPassword())) {
             session.setAttribute("doctor", doctor.getEmail());
-            return "redirect:/patientlist";
+            return "redirect:/doctor/patients";
         }
         return "redirect:/fail_login";
     }
@@ -190,7 +190,7 @@ public class ControllerClass {
 
     @GetMapping("/patientlist")
     public ModelAndView PatientList(HttpSession session) {
-        List<Appointment> apps = appRepo.findByDoctorEmail(session.getAttribute("doctor").toString());
+        List<Appointment> apps = appRepo.findByDoctor_Email(session.getAttribute("doctor").toString());
         Map<String, Object> params = new HashMap<>();
 
         params.put("appointments", apps);
