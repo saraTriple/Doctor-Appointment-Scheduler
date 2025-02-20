@@ -51,6 +51,7 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+
     private void createDoctors() {
         for (int i = 0; i < 10; i++) {
             Doctor doctor = new Doctor();
