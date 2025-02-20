@@ -1,4 +1,4 @@
-package com.externship.appointment.Person_storage;
+package com.externship.appointment.Patient_storage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

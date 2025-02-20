@@ -1,7 +1,5 @@
 package com.externship.appointment.Appointment_storage;
 
-
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -21,7 +19,6 @@ public class AppointmentStatus {
         this.description = description;
     }
 
-    // Getters and setters
     public String getStatus() {
         return status;
     }

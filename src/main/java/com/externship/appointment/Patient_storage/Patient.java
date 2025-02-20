@@ -1,9 +1,13 @@
-package com.externship.appointment.Person_storage;
+package com.externship.appointment.Patient_storage;
 
+import com.externship.appointment.Appointment_storage.Appointment;
+import com.externship.appointment.Prescription_storage.Prescription;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Entity
@@ -30,7 +34,7 @@ public class Patient {
 	private String gender;
 
 	@Column(nullable = false)
-	private Date dateOfBirth;
+	private LocalDate dateOfBirth;
 
 	@Column(nullable = false)
 	private String phoneNumber;
@@ -44,10 +48,16 @@ public class Patient {
 	@Column
 	private String insurancePolicyNumber; // Optional field
 
+	@Transient  // This field won't be persisted in the database
+	private Appointment lastAppointment;
+
+	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Prescription> prescriptions = new ArrayList<Prescription>();
+
 	// Constructors
 	public Patient() {}
 
-	public Patient(String email, String password, String firstName, String lastName, String gender, Date dateOfBirth, String phoneNumber, String address) {
+	public Patient(String email, String password, String firstName, String lastName, String gender, LocalDate dateOfBirth, String phoneNumber, String address) {
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;
@@ -107,11 +117,11 @@ public class Patient {
 		this.gender = gender;
 	}
 
-	public Date getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(Date dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 
@@ -147,6 +157,22 @@ public class Patient {
 		this.insurancePolicyNumber = insurancePolicyNumber;
 	}
 
+	public Appointment getLastAppointment() {
+		return lastAppointment;
+	}
+
+	public void setLastAppointment(Appointment lastAppointment) {
+		this.lastAppointment = lastAppointment;
+	}
+
+	public List<Prescription> getPrescriptions() {
+		return prescriptions;
+	}
+
+	public void setPrescriptions(List<Prescription> prescriptions) {
+		this.prescriptions = prescriptions;
+	}
+
 	@Override
 	public String toString() {
 		return "Patient{" +
@@ -161,6 +187,8 @@ public class Patient {
 				", address='" + address + '\'' +
 				", insuranceProvider='" + insuranceProvider + '\'' +
 				", insurancePolicyNumber='" + insurancePolicyNumber + '\'' +
+				", lastAppointment=" + lastAppointment +
+				", prescriptions=" + prescriptions +
 				'}';
 	}
 }

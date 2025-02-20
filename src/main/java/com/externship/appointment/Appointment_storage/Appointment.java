@@ -1,8 +1,8 @@
 package com.externship.appointment.Appointment_storage;
 
 import com.externship.appointment.Doctor_storage.Doctor;
-import com.externship.appointment.Person_storage.Patient;
-import com.externship.appointment.Appointment_storage.AppointmentStatus;
+import com.externship.appointment.Patient_storage.Patient;
+import com.externship.appointment.Prescription_storage.Prescription;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -15,7 +15,10 @@ public class Appointment {
 	private Long id;
 
 	private LocalDate date;
+
+	@Column(nullable = false)
 	private LocalTime time;
+
 	private double price;
 
 	@ManyToOne
@@ -23,8 +26,11 @@ public class Appointment {
 	private Patient person;
 
 	@ManyToOne
-	@JoinColumn(name = "doctor_id", nullable = false)  // Foreign key to Doctor
+	@JoinColumn(name = "doctor_email", nullable = false)  // Foreign key to Doctor
 	private Doctor doctor;
+
+	@OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Prescription prescription;
 
 	@ManyToOne
 	@JoinColumn(name = "status_id", nullable = false)  // Foreign key to AppointmentStatus
@@ -77,6 +83,14 @@ public class Appointment {
 
 	public void setDoctor(Doctor doctor) {
 		this.doctor = doctor;
+	}
+
+	public Prescription getPrescription() {
+		return prescription;
+	}
+
+	public void setPrescription(Prescription prescription) {
+		this.prescription = prescription;
 	}
 
 	public AppointmentStatus getAppointmentStatus() {

@@ -4,10 +4,12 @@ package com.externship.appointment.initializers;
 import com.externship.appointment.Doctor_storage.Doctor;
 import com.externship.appointment.Doctor_storage.DoctorRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@Order(3)
 public class DoctorDataInitializer implements CommandLineRunner {
 
     private final DoctorRepository doctorRepository;
@@ -18,7 +20,7 @@ public class DoctorDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (doctorRepository.count() == 0) { // Insert only if empty
+        if (doctorRepository.count() <  100) { // Insert only if empty
             List<Doctor> doctors = List.of(
                     new Doctor("dr.john@example.com", "Dr. John Doe", "Cardiologist", "MD", "California", "Los Angeles", "pass123"),
                     new Doctor("dr.smith@example.com", "Dr. Alice Smith", "Neurologist", "PhD", "Texas", "Houston", "pass123"),

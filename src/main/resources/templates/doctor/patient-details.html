@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .medical-record {
+            border-left: 4px solid #007bff;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        .record-date {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #007bff;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4">
+                    <i class="fas fa-user"></i> Patient Details
+                    <a href="/doctor/patients" class="btn btn-secondary float-right">
+                        <i class="fas fa-arrow-left"></i> Back to Patients
+                    </a>
+                </h2>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Patient Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> <span th:text="${patient.firstName + ' ' + patient.lastName}"></span></p>
+                        <p><strong>Email:</strong> <span th:text="${patient.email}"></span></p>
+                        <p><strong>Phone:</strong> <span th:text="${patient.phoneNumber}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Gender:</strong> <span th:text="${patient.gender}"></span></p>
+                        <p><strong>Date of Birth:</strong> <span th:text="${#temporals.format(patient.dateOfBirth, 'dd MMMM yyyy')}"></span></p>
+                        <p><strong>Address:</strong> <span th:text="${patient.address}"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs for History, Prescriptions, and Appointments -->
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-history-tab" data-toggle="pill" href="#pills-history" role="tab">
+                    <i class="fas fa-history"></i> Medical History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-prescriptions-tab" data-toggle="pill" href="#pills-prescriptions" role="tab">
+                    <i class="fas fa-prescription"></i> Prescriptions
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-appointments-tab" data-toggle="pill" href="#pills-appointments" role="tab">
+                    <i class="fas fa-calendar-check"></i> Appointments
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+            <!-- Medical History Tab -->
+            <div class="tab-pane fade show active" id="pills-history" role="tabpanel">
+                <div th:if="${patientHistory.empty}" class="alert alert-info">
+                    No medical history records found for this patient.
+                </div>
+                <div th:each="history : ${patientHistory}" class="medical-record">
+                    <h6 class="record-date" th:text="${#temporals.format(history.recordDate, 'dd MMMM yyyy')}"></h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Blood Type:</strong> <span th:text="${history.bloodType}"></span></p>
+                            <p><strong>Weight:</strong> <span th:text="${history.weight}">kg</span></p>
+                            <p><strong>Height:</strong> <span th:text="${history.height}">cm</span></p>
+                            <p><strong>Allergies:</strong> <span th:text="${history.allergies}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Chronic Conditions:</strong> <span th:text="${history.chronicConditions}"></span></p>
+                            <p><strong>Family History:</strong> <span th:text="${history.familyHistory}"></span></p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <p><strong>Symptoms:</strong> <span th:text="${history.symptoms}"></span></p>
+                        <p><strong>Diagnosis:</strong> <span th:text="${history.diagnosis}"></span></p>
+                        <p><strong>Medications:</strong> <span th:text="${history.medications}"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prescriptions Tab -->
+            <div class="tab-pane fade" id="pills-prescriptions" role="tabpanel">
+                <div th:if="${prescriptions.empty}" class="alert alert-info">
+                    No prescriptions found for this patient.
+                </div>
+                <div th:each="prescription : ${prescriptions}" class="medical-record">
+                    <h6 class="record-date" th:text="${#temporals.format(prescription.prescriptionDate, 'dd MMMM yyyy')}"></h6>
+                    <p><strong>Symptoms:</strong> <span th:text="${prescription.symptoms}"></span></p>
+                    <p><strong>Diagnosis:</strong> <span th:text="${prescription.diagnosis}"></span></p>
+                    <p><strong>Medications:</strong></p>
+                    <ul>
+                        <li th:each="medication : ${prescription.medications}" th:text="${medication}"></li>
+                    </ul>
+                    <p><strong>Dosage Instructions:</strong> <span th:text="${prescription.dosageInstructions}"></span></p>
+                    <p th:if="${prescription.labTests}"><strong>Lab Tests:</strong> <span th:text="${prescription.labTests}"></span></p>
+                    <p th:if="${prescription.doctorNotes}"><strong>Doctor's Notes:</strong> <span th:text="${prescription.doctorNotes}"></span></p>
+                    <p th:if="${prescription.followUpInstructions}"><strong>Follow-up Instructions:</strong> <span th:text="${prescription.followUpInstructions}"></span></p>
+                </div>
+            </div>
+
+            <!-- Appointments Tab -->
+            <div class="tab-pane fade" id="pills-appointments" role="tabpanel">
+                <div th:if="${appointments.empty}" class="alert alert-info">
+                    No appointments found for this patient.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fa fa-calendar"></i> Date</th>
+                                <th><i class="fa fa-clock-o"></i> Time</th>
+                                <th><i class="fa fa-user-md"></i> Doctor</th>
+                                <th><i class="fa fa-info-circle"></i> Status</th>
+                                <th><i class="fa fa-dollar"></i> Price</th>
+                                <th><i class="fa fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="appointment : ${appointments}" >
+                                <td th:text="${#temporals.format(appointment.date, 'dd MMM yyyy')}"></td>
+                                <td th:text="${appointment.time}"></td>
+                                <td th:text="${appointment.doctor.name}"></td>
+                                <td th:text="${appointment.appointmentStatus.status}"></td>
+                                <td>$<span th:text="${#numbers.formatDecimal(appointment.price != null ? appointment.price : 10, 1, 2)}"></span></td>
+                                <td th:if="${appointment.doctor.email == doctor.email}">
+                                    <a th:href="@{'/doctor/appointment/' + ${appointment.id}}" class="btn btn-sm btn-info">
+                                        <i class="fa fa-eye"></i> View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

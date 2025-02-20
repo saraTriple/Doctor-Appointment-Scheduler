@@ -1,13 +1,13 @@
 package com.externship.appointment.Appointment_storage;
 
 public class AppointmentDelete {
-	private String appId;
+	private Long appId;
 
-	public String getAppId() {
+	public Long getAppId() {
 		return appId;
 	}
 
-	public void setAppId(String appId) {
+	public void setAppId(Long appId) {
 		this.appId = appId;
 	}
 }

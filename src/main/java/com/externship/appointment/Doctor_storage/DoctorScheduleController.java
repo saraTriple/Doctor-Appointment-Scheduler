@@ -107,7 +107,7 @@ public class DoctorScheduleController {
                    currentTime.plus(Duration.ofMinutes(Long.parseLong(durationMinutes))).equals(endTime)) {
                 
                 // Check if appointment already exists
-                if (appointmentRepository.findByDateAndTimeAndDoctor_Email(date, currentTime, doctorEmail) != null) {
+                if (!appointmentRepository.findByDateAndTimeAndDoctor_Email(date, currentTime, doctorEmail).isEmpty()) {
                     currentTime = currentTime.plusMinutes(Integer.parseInt(durationMinutes));
                     continue;
                 }

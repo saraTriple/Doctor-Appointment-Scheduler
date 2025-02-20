@@ -42,34 +42,75 @@
         </div>
         
         <div class="table-container">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th><i class="fa fa-calendar"></i> Date</th>
-                            <th><i class="fa fa-clock-o"></i> Time</th>
-                            <th><i class="fa fa-user"></i> Patient Name</th>
-                            <th><i class="fa fa-info-circle"></i> Status</th>
-                            <th><i class="fa fa-cogs"></i> Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="appointment : ${appointments}">
-                            <td th:text="${appointment.date}"></td>
-                            <td th:text="${appointment.time}"></td>
-                            <td th:text="${appointment.patientName}"></td>
-                            <td th:text="${appointment.status}"></td>
-                            <td>
-                                <a th:href="@{'/doctor/appointment/' + ${appointment.id}}" class="btn btn-sm btn-info">View</a>
-                                <button th:if="${appointment.status == 'SCHEDULED'}"
-                                        th:onclick="'completeAppointment(' + ${appointment.id} + ')'"
-                                        class="btn btn-sm btn-success">
-                                    <i class="fa fa-check"></i> Complete
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Appointments List</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Search Form -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="text" id="patientNameSearch" class="form-control" placeholder="Search by patient name...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <input type="date" id="dateSearch" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="time" id="timeSearch" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <select id="statusSearch" class="form-control">
+                                    <option value="">All Statuses</option>
+                                    <option value="SCHEDULED">Scheduled</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="NO_SHOW">No Show</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearFilters()">
+                                <i class="fas fa-undo"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="appointmentsTable">
+                            <thead>
+                                <tr>
+                                    <th><i class="fa fa-calendar"></i> Date</th>
+                                    <th><i class="fa fa-clock-o"></i> Time</th>
+                                    <th><i class="fa fa-user"></i> Patient Name</th>
+                                    <th><i class="fa fa-info-circle"></i> Status</th>
+                                    <th><i class="fa fa-dollar"></i> Price</th>
+                                    <th><i class="fa fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="appointment : ${appointments}">
+                                    <td th:text="${#temporals.format(appointment.date, 'yyyy-MM-dd')}"></td>
+                                    <td th:text="${appointment.time}"></td>
+                                    <td th:text="${appointment.person != null ? appointment.person.firstName + ' ' + appointment.person.lastName : 'Not Assigned'}"></td>
+                                    <td th:text="${appointment.appointmentStatus.status}"></td>
+                                    <td>$<span th:text="${#numbers.formatDecimal(appointment.price != null ? appointment.price : 10, 1, 2)}"></span></td>
+                                    <td>
+                                        <a th:href="@{'/doctor/appointment/' + ${appointment.id}}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-user"></i> View Patient
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -90,6 +131,49 @@
                 });
             }
         }
+
+        // Search functionality for appointments table
+        function filterAppointments() {
+            let patientName = document.getElementById('patientNameSearch').value.toLowerCase();
+            let date = document.getElementById('dateSearch').value;
+            let time = document.getElementById('timeSearch').value;
+            let status = document.getElementById('statusSearch').value.toLowerCase();
+
+            let table = document.getElementById('appointmentsTable');
+            let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (let row of rows) {
+                let rowPatientName = row.cells[2].textContent.toLowerCase();
+                let rowDate = row.cells[0].textContent;
+                let rowTime = row.cells[1].textContent;
+                let rowStatus = row.cells[3].textContent.toLowerCase();
+
+                let dateMatch = !date || rowDate === date;
+                let timeMatch = !time || rowTime === time;
+                let patientMatch = !patientName || rowPatientName.includes(patientName);
+                let statusMatch = !status || rowStatus.includes(status.toLowerCase());
+
+                if (dateMatch && timeMatch && patientMatch && statusMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('patientNameSearch').value = '';
+            document.getElementById('dateSearch').value = '';
+            document.getElementById('timeSearch').value = '';
+            document.getElementById('statusSearch').value = '';
+            filterAppointments();
+        }
+
+        // Add event listeners
+        document.getElementById('patientNameSearch').addEventListener('keyup', filterAppointments);
+        document.getElementById('dateSearch').addEventListener('change', filterAppointments);
+        document.getElementById('timeSearch').addEventListener('change', filterAppointments);
+        document.getElementById('statusSearch').addEventListener('change', filterAppointments);
     </script>
 </body>
 </html>

@@ -3,9 +3,11 @@ package com.externship.appointment.initializers;
 import com.externship.appointment.Appointment_storage.AppointmentStatus;
 import com.externship.appointment.Appointment_storage.AppointmentStatusRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(2)
 public class AppointmentStatusInitializer implements CommandLineRunner {
 
     private final AppointmentStatusRepository appointmentStatusRepository;
