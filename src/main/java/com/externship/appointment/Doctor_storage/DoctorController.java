@@ -127,40 +127,36 @@ public class DoctorController {
         return "doctor/appointment-details";
     }
 
-    @PostMapping("/appointment/{id}/complete")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> completeAppointment(@PathVariable Long id, HttpSession session) {
-        String doctorEmail = (String) session.getAttribute("doctor");
-        if (doctorEmail == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("success", false, "message", "Please login first"));
+    @PostMapping("/appointment/{id}/cancel")
+    public String cancelAppointment(@PathVariable Long id, HttpSession session) {
+        if (session.getAttribute("doctor") == null) {
+            return "redirect:/fail_login";
         }
 
-        try {
-            Appointment appointment = appointmentRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
-
-            if (!appointment.getDoctor().getEmail().equals(doctorEmail)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("success", false, "message", "Not authorized to complete this appointment"));
-            }
-
-            AppointmentStatus completedStatus = appointmentStatusRepository.findById("COMPLETED")
-                    .orElseThrow(() -> new RuntimeException("COMPLETED status not found"));
-
-            appointment.setAppointmentStatus(completedStatus);
+        Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
+        if (appointmentOpt.isPresent()) {
+            Appointment appointment = appointmentOpt.get();
+            appointment.setAppointmentStatus(new AppointmentStatus("CANCELLED", "Cancelled by doctor"));
             appointmentRepository.save(appointment);
-
-            return ResponseEntity.ok()
-                    .body(Map.of("success", true, "message", "Appointment marked as completed"));
-
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("success", false, "message", "Invalid appointment ID"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "Error completing appointment: " + e.getMessage()));
         }
+
+        return "redirect:/doctor/appointments";
+    }
+
+    @PostMapping("/appointment/{id}/complete")
+    public String completeAppointment(@PathVariable Long id, HttpSession session) {
+        if (session.getAttribute("doctor") == null) {
+            return "redirect:/fail_login";
+        }
+
+        Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
+        if (appointmentOpt.isPresent()) {
+            Appointment appointment = appointmentOpt.get();
+            appointment.setAppointmentStatus(new AppointmentStatus("COMPLETED", "Completed by doctor"));
+            appointmentRepository.save(appointment);
+        }
+
+        return "redirect:/doctor/appointments";
     }
 
     @PostMapping("/appointment/{id}/prescribe")
@@ -240,21 +236,21 @@ public class DoctorController {
             return "redirect:/doclog";
         }
 
-        Patient patient = patientRepository.findByEmail(email);
-        if (patient == null) {
+        Optional<Patient> patient = patientRepository.findByEmail(email);
+        if (patient.isEmpty()) {
             return "redirect:/doctor/patients";
         }
 
         // Get patient's history
-        List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(patient);
+        List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(patient.get());
         
         // Get patient's prescriptions
-        List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(patient.getId());
+        List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(patient.get().getId());
         
         // Get patient's appointments
-        List<Appointment> appointments = appointmentRepository.findByPerson_Email(patient.getEmail());
+        List<Appointment> appointments = appointmentRepository.findByPerson_Email(patient.get().getEmail());
 
-        model.addAttribute("patient", patient);
+        model.addAttribute("patient", patient.get());
         model.addAttribute("patientHistory", patientHistory);
         model.addAttribute("prescriptions", prescriptions);
         model.addAttribute("appointments", appointments);

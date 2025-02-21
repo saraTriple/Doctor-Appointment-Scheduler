@@ -130,8 +130,8 @@ public class PatientHistoryDataInitializer implements CommandLineRunner {
                                   String gender, LocalDate dateOfBirth, String phoneNumber, String address,
                                   String insuranceProvider, String insurancePolicyNumber) {
 
-        Patient existingPatient = patientRepository.findByEmail(email);
-        if (existingPatient == null) {
+        Optional<Patient> existingPatient = patientRepository.findByEmail(email);
+        if (existingPatient.isEmpty()) {
             Patient patient = new Patient();
             patient.setEmail(email);
             patient.setFirstName(firstName);
@@ -145,7 +145,7 @@ public class PatientHistoryDataInitializer implements CommandLineRunner {
             patient.setInsurancePolicyNumber(insurancePolicyNumber);
             return patientRepository.save(patient);
         }
-        return existingPatient;
+        return existingPatient.get();
     }
 
     private void createAppointmentsAndHistories(List<Doctor> doctors, List<Patient> patients) {

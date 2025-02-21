@@ -60,7 +60,8 @@ public class DoctorScheduleController {
         modelAndView.addObject("availableDates", availableDates);
         modelAndView.addObject("timeSlots", timeSlots);
         modelAndView.setViewName("doctor/schedule");
-        
+        Optional<Doctor> doctor = doctorRepository.findById(doctorEmail);
+        modelAndView.addObject("doctor", doctor.get());
         return modelAndView;
     }
 
@@ -141,7 +142,7 @@ public class DoctorScheduleController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time,
             @RequestParam String doctorEmail) {
         
-        List<Appointment> existingAppointments = appointmentRepository
+        Optional<Appointment> existingAppointments = appointmentRepository
             .findByDateAndTimeAndDoctor_Email(date, time, doctorEmail);
         
         return existingAppointments.isEmpty();

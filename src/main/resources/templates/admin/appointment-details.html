@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Appointment Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand text-capitalize" href="#">
+            <img src="../../sign.jpg" width="40" height="40" alt="logo" loading="lazy" class="mr-2">
+            Admin Dashboard
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/dashboard}">
+                        <i class="fa fa-home mr-1"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/doctors}">
+                        <i class="fa fa-user-md mr-1"></i> Doctors
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/patients}">
+                        <i class="fa fa-user mr-1"></i> Patients
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/appointments}">
+                        <i class="fa fa-calendar-check mr-1"></i> Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger font-weight-bold" th:href="@{/logout}">
+                        <i class="fa fa-sign-out-alt mr-1"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Appointment Details</h4>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-warning" title="Edit"
+                                data-toggle="modal" data-target="#editModal">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" title="Cancel"
+                                data-toggle="modal" data-target="#cancelModal">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="card-title">Appointment Information</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>ID:</strong> <span th:text="${appointment.id}"></span></li>
+                                <li><strong>Date:</strong> <span th:text="${#temporals.format(appointment.date, 'dd-MM-yyyy')}"></span></li>
+                                <li><strong>Time:</strong> <span th:text="${appointment.time}"></span></li>
+                                <li><strong>Status:</strong> 
+                                    <span th:class="${'badge ' + 
+                                        (appointment.appointmentStatus.status == 'SCHEDULED' ? 'badge-primary' :
+                                        (appointment.appointmentStatus.status == 'COMPLETED' ? 'badge-success' :
+                                        (appointment.appointmentStatus.status == 'CANCELLED' ? 'badge-danger' : 'badge-warning')))}"
+                                          th:text="${appointment.appointmentStatus.status}">
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="card-title">Doctor Information</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Name:</strong> <span th:text="${appointment.doctor.name}"></span></li>
+                                <li><strong>Email:</strong> <span th:text="${appointment.doctor.email}"></span></li>
+                                <li><strong>Specialization:</strong> <span th:text="${appointment.doctor.specialization}"></span></li>
+                            </ul>
+
+                            <h5 class="card-title mt-4">Patient Information</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Name:</strong> <span th:text="${doctor.name}"></span></li>
+                                <li><strong>Email:</strong> <span th:text="${appointment.person.email}"></span></li>
+                                <li><strong>Phone:</strong> <span th:text="${appointment.person.phoneNumber}"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/admin/appointments}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Appointments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/admin/appointment/{id}/edit(id=${appointment.id})}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Appointment</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="SCHEDULED" th:selected="${appointment.appointmentStatus.status == 'SCHEDULED'}">Scheduled</option>
+                            <option value="COMPLETED" th:selected="${appointment.appointmentStatus.status == 'COMPLETED'}">Completed</option>
+                            <option value="CANCELLED" th:selected="${appointment.appointmentStatus.status == 'CANCELLED'}">Cancelled</option>
+                            <option value="NO_SHOW" th:selected="${appointment.appointmentStatus.status == 'NO_SHOW'}">No Show</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/admin/appointment/{id}/cancel(id=${appointment.id})}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel Appointment</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this appointment?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-danger">Yes, Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

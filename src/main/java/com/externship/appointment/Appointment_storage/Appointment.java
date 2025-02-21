@@ -14,9 +14,10 @@ public class Appointment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(name = "date")
 	private LocalDate date;
 
-	@Column(nullable = false)
+	@Column(name = "time")
 	private LocalTime time;
 
 	private double price;

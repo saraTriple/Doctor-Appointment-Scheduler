@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Schedule New Appointment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand text-capitalize" href="#">
+            <img src="../../sign.jpg" width="40" height="40" alt="logo" loading="lazy" class="mr-2">
+            Admin Dashboard
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/dashboard}">
+                        <i class="fa fa-home mr-1"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/doctors}">
+                        <i class="fa fa-user-md mr-1"></i> Doctors
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/patients}">
+                        <i class="fa fa-user mr-1"></i> Patients
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/appointments}">
+                        <i class="fa fa-calendar-check mr-1"></i> Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger font-weight-bold" th:href="@{/logout}">
+                        <i class="fa fa-sign-out-alt mr-1"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Schedule New Appointment</h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/schedule}" method="post">
+                        <!-- Doctor Selection -->
+                        <div class="form-group">
+                            <label for="doctorEmail">Doctor</label>
+                            <select id="doctorEmail" name="doctorEmail" class="form-control" required>
+                                <option value="">Select a Doctor</option>
+                                <option th:each="doctor : ${doctors}"
+                                        th:value="${doctor.email}"
+                                        th:text="${doctor.name + ' (' + doctor.specialization + ')'}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Patient Selection -->
+                        <div class="form-group">
+                            <label for="patientEmail">Patient</label>
+                            <select id="patientEmail" name="patientEmail" class="form-control" required>
+                                <option value="">Select a Patient</option>
+                                <option th:each="patient : ${patients}"
+                                        th:value="${patient.email}"
+                                        th:text="${patient.firstName + ' ' + patient.lastName}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Date and Time -->
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="date">Date</label>
+                                <input type="date" id="date" name="date" class="form-control" required
+                                       th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                       pattern="\d{4}-\d{2}-\d{2}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="time">Time</label>
+                                <input type="time" id="time" name="time" class="form-control" required step="60">
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div th:if="${param.error}" class="alert alert-danger">
+                            <span th:text="${param.error[0] == 'invalid_users'} ? 'Selected doctor or patient is invalid.' : 
+                                          (param.error[0] == 'invalid_date' ? 'Invalid date format. Please use YYYY-MM-DD format.' : 'An error occurred.')">
+                            </span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-right">
+                            <a th:href="@{/admin/appointments}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i> Schedule Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
