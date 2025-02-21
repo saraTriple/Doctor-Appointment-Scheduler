@@ -11,15 +11,22 @@ import com.externship.appointment.Doctor_storage.DoctorRepository;
 import com.externship.appointment.Patient_storage.Patient;
 import com.externship.appointment.Patient_storage.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class ControllerClass {
@@ -201,5 +208,129 @@ public class ControllerClass {
 
     }
 
+    @GetMapping("/doctors")
+    public String listDoctors(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String specialization,
+            @RequestParam(required = false) String state,
+            Model model) {
 
+        List<Doctor> doctors;
+        if (name != null || specialization != null || state != null) {
+            doctors = docRepo.findAll().stream()
+                    .filter(d -> name == null || d.getName().toLowerCase().contains(name.toLowerCase()))
+                    .filter(d -> specialization == null || d.getSpecialization().toLowerCase().contains(specialization.toLowerCase()))
+                    .filter(d -> state == null || Objects.nonNull(d.getState()) && d.getState().toLowerCase().contains(state.toLowerCase()))
+                    .collect(Collectors.toList());
+        } else {
+            doctors = docRepo.findAll();
+        }
+
+        model.addAttribute("doctors", doctors);
+        return "public/doctors";
+    }
+
+    @GetMapping("/doctors/{email}")
+    public String showDoctorDetails(
+            @PathVariable String email,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time,
+            Model model) {
+
+        Doctor doctor = docRepo.findById(email)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("date").ascending().and(Sort.by("time").ascending()));
+        Page<Appointment> appointments;
+
+        if (date != null && time == null) {
+            appointments = appRepo.findByDateAndDoctor_EmailAndPerson_EmailIsNull(
+                    date, email, pageable);
+        } else if (time != null && date == null) {
+            appointments = appRepo.findByTimeAndDoctor_EmailAndPerson_EmailIsNull(
+                    time, email, pageable);
+        } else if (time != null && date != null) {
+            appointments = appRepo.findByDateAndTimeAndDoctor_EmailAndPerson_EmailIsNull(
+                    date, time, email, pageable);
+        } else {
+            appointments = appRepo.findByDoctor_EmailAndDateGreaterThanEqualAndPerson_EmailIsNull(
+                    email, LocalDate.now(), pageable);
+        }
+
+        model.addAttribute("doctor", doctor);
+        model.addAttribute("appointments", appointments);
+        return "public/doctor-details";
+    }
+
+    @GetMapping("/appointments")
+    public String listAppointments(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) String doctorName,
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
+
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("date").ascending().and(Sort.by("time").ascending()));
+
+        Page<Appointment> appointments = appRepo.findByDoctor_EmailAndDateGreaterThanEqualAndPerson_EmailIsNull(
+                null, LocalDate.now(), pageable);
+
+        if (specialty != null || doctorName != null || date != null) {
+            appointments = appRepo.findByFilters(
+                    LocalDate.now(),
+                    date,
+                    specialty,
+                    doctorName,
+                    pageable);
+        }
+
+        model.addAttribute("appointments", appointments);
+        return "public/available-appointments";
+    }
+
+    @GetMapping("/appointments/available")
+    public String listAvailableAppointments(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) String doctorName,
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
+
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("date").ascending().and(Sort.by("time").ascending()));
+
+        Page<Appointment> appointments = appRepo.findByDoctor_EmailAndDateGreaterThanEqualAndPerson_EmailIsNull(
+                null, LocalDate.now(), pageable);
+
+        if (specialty != null || doctorName != null || date != null) {
+            appointments = appRepo.findByFilters(
+                    LocalDate.now(),
+                    date,
+                    specialty,
+                    doctorName,
+                    pageable);
+        }
+
+        model.addAttribute("appointments", appointments);
+        return "public/available-appointments";
+    }
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
+    }
+
+    @GetMapping("/admin/login")
+    public String showAdminLogin() {
+        return "admin/login";
+    }
+
+    @GetMapping("/doctor/login")
+    public String showDoctorLogin() {
+        return "doctor/login";
+    }
+
+    @GetMapping("/patient/login")
+    public String showPatientLogin() {
+        return "patient/login";
+    }
 }
