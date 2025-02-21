@@ -8,6 +8,7 @@ import com.externship.appointment.Patient_storage.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,53 +51,70 @@ public class AdminController {
 
     // Appointments List Page with Pagination
     @GetMapping("/appointments")
-    public String appointmentsList(
+    public String getAppointments(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String time,
             @RequestParam(required = false) String doctorEmail,
             @RequestParam(required = false) String status,
             Model model,
             HttpSession session) {
-
+        
         if (session.getAttribute("admin") == null) {
-            return "redirect:/fail_login";
+            return "redirect:/admin/login";
         }
 
-        Page<Appointment> appointmentsPage;
-        if (doctorEmail != null && !doctorEmail.isEmpty()) {
-            appointmentsPage = appointmentService.getAppointmentsByDoctor(doctorEmail, PageRequest.of(page, size, Sort.by("date").descending()));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("date").ascending().and(Sort.by("time")));
+        Page<Appointment> appointments;
+
+        if (date != null && !date.isEmpty()) {
+            LocalDate filterDate = LocalDate.parse(date);
+            if (time != null && !time.isEmpty()) {
+                LocalTime filterTime = LocalTime.parse(time);
+                appointments = appointmentRepository.findByDateAndTime(filterDate, filterTime, pageable);
+            } else {
+                appointments = appointmentRepository.findByDate(filterDate, pageable);
+            }
+        } else if (time != null && !time.isEmpty()) {
+            LocalTime filterTime = LocalTime.parse(time);
+            appointments = appointmentRepository.findByTime(filterTime, pageable);
         } else if (status != null && !status.isEmpty()) {
-            appointmentsPage = appointmentService.getAppointmentsByStatus(status, PageRequest.of(page, size, Sort.by("date").descending()));
+            appointments = appointmentRepository.findByStatus(status, pageable);
+        } else if (doctorEmail != null && !doctorEmail.isEmpty()) {
+            appointments = appointmentRepository.findByDoctorEmail(doctorEmail, pageable);
         } else {
-            appointmentsPage = appointmentService.getAllAppointmentsPaginated(PageRequest.of(page, size, Sort.by("date").descending()));
+            appointments = appointmentRepository.findAll(pageable);
         }
 
-        model.addAttribute("appointments", appointmentsPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", appointmentsPage.getTotalPages());
+        // Add doctors list to the model
         model.addAttribute("doctors", doctorRepository.findAll());
-
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", appointments.getTotalPages());
         return "admin/appointments";
     }
 
     // Doctors List Page with Pagination
     @GetMapping("/doctors")
-    public String doctorsList(
+    public String getDoctors(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) String degree,
             Model model,
             HttpSession session) {
-
+        
         if (session.getAttribute("admin") == null) {
-            return "redirect:/fail_login";
+            return "redirect:/admin/login";
         }
 
-        Page<Doctor> doctorsPage = doctorRepository.findAll(PageRequest.of(page, size, Sort.by("email")));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("name").ascending());
+        Page<Doctor> doctors = doctorRepository.findByFilters(name, email, specialty, degree, pageable);
 
-        model.addAttribute("doctors", doctorsPage.getContent());
+        model.addAttribute("doctors", doctors);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", doctorsPage.getTotalPages());
-
+        model.addAttribute("totalPages", doctors.getTotalPages());
         return "admin/doctors";
     }
 
@@ -201,5 +219,28 @@ public class AdminController {
         }
 
         return "redirect:/admin/schedule?error=invalid_users";
+    }
+
+    @GetMapping("/patients")
+    public String getPatients(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String phoneNumber,
+            Model model,
+            HttpSession session) {
+        
+        if (session.getAttribute("admin") == null) {
+            return "redirect:/admin/login";
+        }
+
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("firstName").ascending());
+        Page<Patient> patients = patientRepository.findByFilters(email, firstName, lastName, phoneNumber, pageable);
+
+        model.addAttribute("patients", patients);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", patients.getTotalPages());
+        return "admin/patients";
     }
 }
