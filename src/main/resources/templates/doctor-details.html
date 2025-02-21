@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Details & Appointments</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <style>
+        .doctor-profile {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .appointment-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .appointment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .appointment-filters {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" style="font-family: 'Poppins', sans-serif;">
+            <a class="navbar-brand text-capitalize" href="#">
+                <img src="sign.jpg" width="40" height="40" alt="logo" loading="lazy" class="mr-2">Doctor's Appointment
+            </a>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">
+                            <i class="fa fa-home mr-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/userdetails}">
+                            <i class="fa fa-medkit mr-1"></i>Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="fa fa-sign-out mr-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <!-- Doctor Profile -->
+        <div class="doctor-profile">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2 th:text="${doctor.name}">Doctor Name</h2>
+                    <h4 class="text-muted" th:text="${doctor.specialization}">Specialization</h4>
+                    <p>
+                        <i class="fa fa-graduation-cap mr-2"></i>
+                        <span th:text="${doctor.degree}">Degree</span>
+                    </p>
+                    <p>
+                        <i class="fa fa-map-marker mr-2"></i>
+                        <span th:text="${doctor.city + ', ' + doctor.state}">Location</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments Section -->
+        <h3 class="mb-4">Available Appointments</h3>
+        
+        <!-- Appointment Filters -->
+        <div class="appointment-filters">
+            <form th:action="@{'/doctor/' + ${doctor.email} + '/appointments'}" method="get" class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" th:value="${param.date}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <select class="form-control" id="time" name="time">
+                            <option value="">All Times</option>
+                            <option value="morning">Morning (9 AM - 12 PM)</option>
+                            <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                            <option value="evening">Evening (5 PM - 9 PM)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fa fa-filter mr-2"></i>Filter Appointments
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Appointments List -->
+        <div class="row">
+            <div class="col-md-4" th:each="appointment : ${appointments}">
+                <div class="card appointment-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fa fa-calendar mr-2"></i>
+                            <span th:text="${#temporals.format(appointment.date, 'MMMM dd, yyyy')}">Date</span>
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <i class="fa fa-clock-o mr-2"></i>
+                            <span th:text="${#temporals.format(appointment.time, 'hh:mm a')}">Time</span>
+                        </h6>
+                        <p class="card-text" th:if="${appointment.price}">
+                            <i class="fa fa-money mr-2"></i>
+                            <span th:text="'$' + ${appointment.price}">Price</span>
+                        </p>
+                        <div th:if="${session.patient}">
+                            <form th:action="@{'/appointments/book'}" method="post">
+                                <input type="hidden" name="appointmentId" th:value="${appointment.id}">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fa fa-calendar-check-o mr-2"></i>Book Appointment
+                                </button>
+                            </form>
+                        </div>
+                        <div th:unless="${session.patient}" class="text-center">
+                            <a th:href="@{/login}" class="btn btn-outline-primary w-100">
+                                Login to Book Appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

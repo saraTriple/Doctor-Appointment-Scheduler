@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="patient/fragments/header :: header"></head>
+<body>
+    <div th:replace="patient/fragments/header :: nav"></div>
+
+    <div class="container main-content">
+        <h2 class="mb-4">Our Doctors</h2>
+
+        <!-- Search Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/patient/doctors}" method="get" class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Doctor Name</label>
+                            <input type="text" class="form-control" name="name" th:value="${param.name}" placeholder="Search by name">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Specialization</label>
+                            <input type="text" class="form-control" name="specialization" th:value="${param.specialization}" placeholder="Search by specialization">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" class="form-control" name="state" th:value="${param.state}" placeholder="Search by state">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fa fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Doctors Grid -->
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="doctor : ${doctors}">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="fa fa-user-md fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title text-center" th:text="${doctor.name}">Doctor Name</h5>
+                        <p class="card-text text-center text-muted" th:text="${doctor.specialization}">Specialization</p>
+                        <hr>
+                        <div class="doctor-info">
+                            <p><i class="fa fa-map-marker"></i> <span th:text="${doctor.state}">Location</span></p>
+                            <p><i class="fa fa-envelope"></i> <span th:text="${doctor.email}">Email</span></p>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a th:href="@{'/patient/doctors/' + ${doctor.email}}" class="btn btn-outline-primary">
+                                <i class="fa fa-calendar"></i> View Available Slots
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12" th:if="${doctors.empty}">
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> No doctors found matching your criteria.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="patient/fragments/header :: scripts"></div>
+</body>
+</html>

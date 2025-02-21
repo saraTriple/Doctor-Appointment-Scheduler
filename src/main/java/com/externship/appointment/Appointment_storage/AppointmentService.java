@@ -42,6 +42,6 @@ public class AppointmentService {
     }
     
     public Page<Appointment> getAppointmentsByStatus(String status, Pageable pageable) {
-        return appointmentRepository.findByStatus(status, pageable);
+        return appointmentRepository.findByAppointmentStatus_Status(status, pageable);
     }
 }

@@ -26,8 +26,8 @@ public class AdminInitializer {
         return args -> {
             if (adminRepository.count() == 0) {
                 List<Admin> admins = List.of(
-                        new Admin("admin1@example.com", passwordEncoder.encode("password1")),
-                        new Admin("admin2@example.com", passwordEncoder.encode("password2"))
+                        new Admin("admin1@example.com", "password1"),
+                        new Admin("admin2@example.com", "password2")
                 );
                 adminRepository.saveAll(admins);
                 System.out.println("Admin accounts initialized.");

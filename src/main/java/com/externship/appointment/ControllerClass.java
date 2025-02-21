@@ -89,9 +89,9 @@ public class ControllerClass {
 
     @PostMapping("/authenticate")
     public String authenticate(Patient person, HttpSession session) {
-        if (personRepo.existsById(person.getEmail()) && personRepo.findById(person.getEmail()).get().getPassword().equals(person.getPassword())) {
-            session.setAttribute("person", person.getEmail());
-            return "redirect:/home";
+        if (personRepo.findByEmail(person.getEmail()).get().getPassword().equals(person.getPassword())) {
+            session.setAttribute("patient", person.getEmail());
+            return "redirect:/patient/appointments/my";
         }
         return "redirect:/fail_login";
     }

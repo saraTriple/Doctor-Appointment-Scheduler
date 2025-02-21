@@ -30,7 +30,7 @@ public class PatientInitializer {
             for (int i = 1; i <= 50; i++) {
                 Patient patient = new Patient();
                 patient.setEmail("patient" + i + "@example.com");
-                patient.setPassword(passwordEncoder.encode("password" + i));
+                patient.setPassword("password");
                 patient.setFirstName("FirstName" + i);
                 patient.setLastName("LastName" + i);
                 patient.setGender(i % 2 == 0 ? "Male" : "Female");

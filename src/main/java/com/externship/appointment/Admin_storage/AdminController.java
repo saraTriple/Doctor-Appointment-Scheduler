@@ -79,9 +79,9 @@ public class AdminController {
             LocalTime filterTime = LocalTime.parse(time);
             appointments = appointmentRepository.findByTime(filterTime, pageable);
         } else if (status != null && !status.isEmpty()) {
-            appointments = appointmentRepository.findByStatus(status, pageable);
+            appointments = appointmentRepository.findByAppointmentStatus_Status(status, pageable);
         } else if (doctorEmail != null && !doctorEmail.isEmpty()) {
-            appointments = appointmentRepository.findByDoctorEmail(doctorEmail, pageable);
+            appointments = appointmentRepository.findByDoctor_Email(doctorEmail, pageable);
         } else {
             appointments = appointmentRepository.findAll(pageable);
         }

@@ -45,12 +45,12 @@
         <tbody>
           <tr valign="top" th:each="app:${appointments}">
 			
-			<td valign="top" th:text="${app.docId}"type="text">Id</td>
-			<td valign="top" th:text="${app.docName}">Name</td>
-			<td valign="top" th:text="${app.docSpecial}">Specialization</td>
+			<td valign="top" th:text="${app.doctor.email}"type="text">Id</td>
+			<td valign="top" th:text="${app.doctor.name}">Name</td>
+			<td valign="top" th:text="${app.doctor.specialization}">Specialization</td>
 			<td valign="top" th:text="${app.date}">Name</td>
 			<form method="POST" th:action="@{/cancel}">
-			<input type="hidden" name="appId" th:value="${app.appId}">
+			<input type="hidden" name="appId" th:value="${app.id}">
 			<td><button type="submit" value="value" class="link-button">Cancel</button></td>
 			</form>
 			<td>

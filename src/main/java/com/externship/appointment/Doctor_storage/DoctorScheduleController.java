@@ -142,7 +142,7 @@ public class DoctorScheduleController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time,
             @RequestParam String doctorEmail) {
         
-        Optional<Appointment> existingAppointments = appointmentRepository
+        List<Appointment> existingAppointments = appointmentRepository
             .findByDateAndTimeAndDoctor_Email(date, time, doctorEmail);
         
         return existingAppointments.isEmpty();

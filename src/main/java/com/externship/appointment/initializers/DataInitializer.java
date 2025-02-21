@@ -59,7 +59,7 @@ public class DataInitializer implements CommandLineRunner {
             String lastName = PERSIAN_LAST_NAMES.get(i);
             doctor.setName(firstName + " " + lastName);
             doctor.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@hospital.com");
-            doctor.setPassword(passwordEncoder.encode("password"));
+            doctor.setPassword("password");
             doctor.setSpecialization(SPECIALIZATIONS.get(i));
 //            doctor.setPhoneNumber("09" + String.format("%09d", i + 100000000));
             doctorRepository.save(doctor);
@@ -74,7 +74,7 @@ public class DataInitializer implements CommandLineRunner {
             patient.setFirstName(firstName);
             patient.setLastName(lastName);
             patient.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@email.com");
-            patient.setPassword(passwordEncoder.encode("password"));
+            patient.setPassword("password");
             patient.setPhoneNumber("09" + String.format("%09d", i + 100000000));
             patient.setAddress("Tehran, " + PERSIAN_LAST_NAMES.get(i) + " Street");
             patient.setGender(i % 2 == 0 ? "Male" : "Female");

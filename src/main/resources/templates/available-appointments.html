@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Appointments</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <style>
+        .filters-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .appointment-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .appointment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .doctor-info {
+            border-left: 3px solid #007bff;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" style="font-family: 'Poppins', sans-serif;">
+            <a class="navbar-brand text-capitalize" href="#">
+                <img src="sign.jpg" width="40" height="40" alt="logo" loading="lazy" class="mr-2">Doctor's Appointment
+            </a>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">
+                            <i class="fa fa-home mr-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/userdetails}">
+                            <i class="fa fa-medkit mr-1"></i>My Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/doctors}">
+                            <i class="fa fa-user-md mr-1"></i>Find Doctors
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="fa fa-sign-out mr-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Available Appointments</h2>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <form th:action="@{/appointments/available}" method="get" class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" th:value="${param.date}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <select class="form-control" id="time" name="time">
+                            <option value="">All Times</option>
+                            <option value="morning">Morning (9 AM - 12 PM)</option>
+                            <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                            <option value="evening">Evening (5 PM - 9 PM)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="specialty">Specialty</label>
+                        <input type="text" class="form-control" id="specialty" name="specialty" 
+                               th:value="${param.specialty}" placeholder="e.g. Cardiology">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="doctorName">Doctor Name</label>
+                        <input type="text" class="form-control" id="doctorName" name="doctorName" 
+                               th:value="${param.doctorName}" placeholder="Doctor's name">
+                    </div>
+                </div>
+                <div class="col-12 text-right">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-filter mr-2"></i>Apply Filters
+                    </button>
+                    <a th:href="@{/appointments/available}" class="btn btn-outline-secondary ml-2">
+                        <i class="fa fa-refresh mr-2"></i>Reset Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Appointments List -->
+        <div class="row">
+            <div class="col-md-6" th:each="appointment : ${appointments}">
+                <div class="card appointment-card">
+                    <div class="card-body">
+                        <div class="doctor-info mb-3">
+                            <h5 class="card-title" th:text="${appointment.doctor.name}">Doctor Name</h5>
+                            <h6 class="card-subtitle text-muted" th:text="${appointment.doctor.specialization}">Specialization</h6>
+                        </div>
+                        <p class="card-text">
+                            <i class="fa fa-calendar mr-2"></i>
+                            <span th:text="${#temporals.format(appointment.date, 'MMMM dd, yyyy')}">Date</span>
+                        </p>
+                        <p class="card-text">
+                            <i class="fa fa-clock-o mr-2"></i>
+                            <span th:text="${#temporals.format(appointment.time, 'hh:mm a')}">Time</span>
+                        </p>
+                        <p class="card-text">
+                            <i class="fa fa-map-marker mr-2"></i>
+                            <span th:text="${appointment.doctor.city + ', ' + appointment.doctor.state}">Location</span>
+                        </p>
+                        <p class="card-text" th:if="${appointment.price}">
+                            <i class="fa fa-money mr-2"></i>
+                            <span th:text="'$' + ${appointment.price}">Price</span>
+                        </p>
+                        <div th:if="${session.patient}">
+                            <form th:action="@{'/appointments/book'}" method="post">
+                                <input type="hidden" name="appointmentId" th:value="${appointment.id}">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fa fa-calendar-check-o mr-2"></i>Book Appointment
+                                </button>
+                            </form>
+                        </div>
+                        <div th:unless="${session.patient}" class="text-center">
+                            <a th:href="@{/login}" class="btn btn-outline-primary w-100">
+                                Login to Book Appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${appointments.totalPages > 1}" aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${appointments.first ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{${appointments.first ? '#' : '/appointments/available(page=${appointments.number - 1})}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, appointments.totalPages - 1)}"
+                    th:classappend="${pageNumber == appointments.number ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/appointments/available(page=${pageNumber})}" th:text="${pageNumber + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${appointments.last ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{${appointments.last ? '#' : '/appointments/available(page=${appointments.number + 1})}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

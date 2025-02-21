@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="patient/fragments/header :: header"></head>
+<body>
+    <div th:replace="patient/fragments/header :: nav"></div>
+
+    <div class="container main-content">
+        <h2 class="mb-4">My Appointments</h2>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4" th:each="appointment : ${appointments}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5 class="card-title" th:text="${appointment.doctor.name}">Doctor Name</h5>
+                                <p class="text-muted" th:text="${appointment.doctor.specialization}">Specialization</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><i class="fa fa-calendar"></i> <span th:text="${appointment.date}">Date</span></p>
+                                <p><i class="fa fa-clock-o"></i> <span th:text="${appointment.time}">Time</span></p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><i class="fa fa-map-marker"></i> <span th:text="${appointment.doctor.state}">Location</span></p>
+                                <p><i class="fa fa-info-circle"></i> Status: <span th:text="${appointment.appointmentStatus.status}">Status</span></p>
+                            </div>
+                            <div class="col-md-3 text-right">
+                                <button class="btn btn-danger cancel-appointment-btn"
+                                    th:data-appointment-id="${appointment.id}"
+                                    th:data-doctor-name="${appointment.doctor.name}"
+                                    th:data-date="${appointment.date}"
+                                    th:data-time="${appointment.time}">
+                                    <i class="fa fa-times"></i> Cancel Appointment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${appointments.empty}" class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> You don't have any appointments scheduled.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Cancellation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel your appointment with:</p>
+                    <div class="appointment-details">
+                        <p><strong>Doctor:</strong> <span id="modalDoctorName"></span></p>
+                        <p><strong>Date:</strong> <span id="modalDate"></span></p>
+                        <p><strong>Time:</strong> <span id="modalTime"></span></p>
+                    </div>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Keep Appointment</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancel">
+                        <i class="fa fa-times"></i> Cancel Appointment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Success</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-check-circle text-success" style="font-size: 48px;"></i>
+                        <p class="mt-3">Appointment cancelled successfully!</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='/patient/appointments/book'">
+                        Book New Appointment
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fa fa-times-circle text-danger" style="font-size: 48px;"></i>
+                        <p class="mt-3" id="errorMessage">An error occurred while cancelling the appointment.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="patient/fragments/header :: scripts"></div>
+
+    <script>
+    let currentAppointmentId = null;
+
+    // Add click handlers to all cancel buttons
+    document.querySelectorAll('.cancel-appointment-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const appointmentId = this.getAttribute('data-appointment-id');
+            const doctorName = this.getAttribute('data-doctor-name');
+            const date = this.getAttribute('data-date');
+            const time = this.getAttribute('data-time');
+            showCancelModal(appointmentId, doctorName, date, time);
+        });
+    });
+
+    function showCancelModal(appointmentId, doctorName, date, time) {
+        currentAppointmentId = appointmentId;
+        document.getElementById('modalDoctorName').textContent = doctorName;
+        document.getElementById('modalDate').textContent = date;
+        document.getElementById('modalTime').textContent = time;
+        $('#cancelModal').modal('show');
+    }
+
+    document.getElementById('confirmCancel').addEventListener('click', function() {
+        if (!currentAppointmentId) return;
+
+        fetch('/patient/appointments/cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'appointmentId=' + currentAppointmentId
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(text);
+                });
+            }
+            return response.text();
+        })
+        .then(data => {
+            $('#cancelModal').modal('hide');
+            $('#successModal').modal('show');
+        })
+        .catch(error => {
+            $('#cancelModal').modal('hide');
+            document.getElementById('errorMessage').textContent = error.message || 'An error occurred while cancelling the appointment.';
+            $('#errorModal').modal('show');
+        });
+    });
+
+    // Handle modal closing
+    $('#successModal').on('hidden.bs.modal', function () {
+        window.location.reload();
+    });
+    </script>
+</body>
+</html>
