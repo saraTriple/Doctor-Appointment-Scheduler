@@ -11,6 +11,7 @@ import com.externship.appointment.Prescription_storage.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +49,6 @@ public class DoctorController {
     @Autowired
     private PrescriptionRepository prescriptionRepository;
 
-
     @GetMapping("/patients")
     public String showPatients(Model model, HttpSession session) {
         String doctorEmail = (String) session.getAttribute("doctor");
@@ -56,26 +56,26 @@ public class DoctorController {
             return "redirect:/doclog";
         }
 
-        List<Appointment> doctorAppointments = appointmentService.findByDocId(doctorEmail);
-        
+        List<Appointment> doctorAppointments = appointmentService.findByDoctorId(doctorEmail);
+
         // Get unique patients with their last appointment
         Map<String, Appointment> latestAppointments = doctorAppointments.stream()
                 .filter(apm -> Objects.nonNull(apm.getPerson()))
                 .collect(Collectors.groupingBy(
-                    appointment -> appointment.getPerson().getEmail(),
-                    Collectors.collectingAndThen(
-                        Collectors.maxBy((a1, a2) -> {
-                            int dateCompare = a1.getDate().compareTo(a2.getDate());
-                            return dateCompare != 0 ? dateCompare : a1.getTime().compareTo(a2.getTime());
-                        }),
-                        optional -> optional.orElse(null)
-                    )
+                        appointment -> appointment.getPerson().getEmail(),
+                        Collectors.collectingAndThen(
+                                Collectors.maxBy((a1, a2) -> {
+                                    int dateCompare = a1.getDate().compareTo(a2.getDate());
+                                    return dateCompare != 0 ? dateCompare : a1.getTime().compareTo(a2.getTime());
+                                }),
+                                optional -> optional.orElse(null)
+                        )
                 ));
 
         List<Patient> patients = new ArrayList<>();
         for (Appointment appointment : latestAppointments.values()) {
             Patient patient = appointment.getPerson();
-            patient.setLastAppointment(appointment);  // Add this field to Patient class
+            patient.setLastAppointment(appointment);
             patients.add(patient);
         }
         Optional<Doctor> doctor = doctorRepository.findById(doctorEmail);
@@ -91,7 +91,7 @@ public class DoctorController {
             return "redirect:/doclog";
         }
 
-        List<Appointment> appointments = appointmentService.findByDocId(doctorEmail);
+        List<Appointment> appointments = appointmentService.findByDoctorId(doctorEmail);
         model.addAttribute("appointments", appointments);
         Optional<Doctor> doctor = doctorRepository.findById(doctorEmail);
         model.addAttribute("doctor", doctor.get());
@@ -99,31 +99,30 @@ public class DoctorController {
     }
 
     @GetMapping("/appointment/{id}")
-    public String showAppointmentDetails(@PathVariable Long id, Model model, HttpSession session) {
-        String doctorEmail = (String) session.getAttribute("doctor");
-        if (doctorEmail == null) {
-            return "redirect:/doclog";
-        }
+    public String viewAppointmentDetails(@PathVariable Long id, Model model, Authentication authentication) {
+        String doctorEmail = authentication.getName();
+        Optional<Doctor> doctor = doctorRepository.findById(doctorEmail);
+        Optional<Appointment> appointment = appointmentRepository.findById(id);
 
-        Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
-        if (appointmentOpt.isEmpty()) {
+        if (appointment.isEmpty()) {
             return "redirect:/doctor/appointments";
         }
 
-        Appointment appointment = appointmentOpt.get();
-        model.addAttribute("appointment", appointment);
+        // Verify the appointment belongs to the logged-in doctor
+        if (!appointment.get().getDoctor().getEmail().equals(doctor.get().getEmail())) {
+            throw new RuntimeException("Unauthorized access to appointment");
+        }
 
-        if (appointment.getPerson() != null) {
-            List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(appointment.getPerson());
+        if (appointment.get().getPerson() != null) {
+            List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(appointment.get().getPerson());
             model.addAttribute("patientHistory", patientHistory);
 
-            List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(appointment.getPerson().getId());
+            List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(appointment.get().getPerson().getId());
             model.addAttribute("prescriptions", prescriptions);
         }
 
-        Optional<Doctor> doctor = doctorRepository.findById(doctorEmail);
+        model.addAttribute("appointment", appointment.get());
         model.addAttribute("doctor", doctor.get());
-
         return "doctor/appointment-details";
     }
 
@@ -165,21 +164,21 @@ public class DoctorController {
 
     @PostMapping("/appointment/{id}/prescribe")
     public String prescribePatient(@PathVariable Long id,
-                                 @RequestParam String symptoms,
-                                 @RequestParam String diagnosis,
-                                 @RequestParam List<String> medications,
-                                 @RequestParam String dosageInstructions,
-                                 @RequestParam(required = false) String labTests,
-                                 @RequestParam(required = false) String doctorNotes,
-                                 @RequestParam(required = false) String followUpInstructions,
-                                 @RequestParam(required = false) String bloodType,
-                                 @RequestParam(required = false) Double weight,
-                                 @RequestParam(required = false) Double height,
-                                 @RequestParam(required = false) String allergies,
-                                 @RequestParam(required = false) String chronicConditions,
-                                 @RequestParam(required = false) String familyHistory,
-                                 HttpSession session) {
-        
+                                   @RequestParam String symptoms,
+                                   @RequestParam String diagnosis,
+                                   @RequestParam List<String> medications,
+                                   @RequestParam String dosageInstructions,
+                                   @RequestParam(required = false) String labTests,
+                                   @RequestParam(required = false) String doctorNotes,
+                                   @RequestParam(required = false) String followUpInstructions,
+                                   @RequestParam(required = false) String bloodType,
+                                   @RequestParam(required = false) Double weight,
+                                   @RequestParam(required = false) Double height,
+                                   @RequestParam(required = false) String allergies,
+                                   @RequestParam(required = false) String chronicConditions,
+                                   @RequestParam(required = false) String familyHistory,
+                                   HttpSession session) {
+
         String doctorEmail = (String) session.getAttribute("doctor");
         if (doctorEmail == null) {
             return "redirect:/doclog";
@@ -191,11 +190,13 @@ public class DoctorController {
         }
 
         Appointment appointment = appointmentOpt.get();
-        
+
         // Create new prescription
         Prescription prescription = new Prescription();
         prescription.setAppointment(appointment);
         prescription.setPrescriptionDate(LocalDate.now());
+        prescription.setPatient(appointment.getPerson());
+//        prescription.setA(appointment.getDoctor());
         prescription.setSymptoms(symptoms);
         prescription.setDiagnosis(diagnosis);
         prescription.setMedications(medications);
@@ -203,33 +204,22 @@ public class DoctorController {
         prescription.setLabTests(labTests);
         prescription.setDoctorNotes(doctorNotes);
         prescription.setFollowUpInstructions(followUpInstructions);
-        prescription.setAppointment(appointment);
-        prescription.setPatient(appointment.getPerson());
+
         prescriptionRepository.save(prescription);
 
-        // Create new patient history record
-        PatientHistory history = new PatientHistory();
-        history.setPatient(appointment.getPerson());
-        history.setRecordDate(LocalDate.now());
-        history.setSymptoms(symptoms);
-        history.setDiagnosis(diagnosis);
-        history.setMedications(String.join(", ", medications));
-        
-        // Add optional medical history fields
-        if (bloodType != null && !bloodType.isEmpty()) history.setBloodType(bloodType);
-        if (weight != null) history.setWeight(weight);
-        if (height != null) history.setHeight(height);
-        if (allergies != null && !allergies.isEmpty()) history.setAllergies(allergies);
-        if (chronicConditions != null && !chronicConditions.isEmpty()) history.setChronicConditions(chronicConditions);
-        if (familyHistory != null && !familyHistory.isEmpty()) history.setFamilyHistory(familyHistory);
-        
-        patientHistoryRepository.save(history);
+        // Update or create patient history
+        PatientHistory patientHistory = new PatientHistory();
+        patientHistory.setPatient(appointment.getPerson());
+        if (bloodType != null) patientHistory.setBloodType(bloodType);
+        if (weight != null) patientHistory.setWeight(weight);
+        if (height != null) patientHistory.setHeight(height);
+        if (allergies != null) patientHistory.setAllergies(allergies);
+        if (chronicConditions != null) patientHistory.setChronicConditions(chronicConditions);
+        if (familyHistory != null) patientHistory.setFamilyHistory(familyHistory);
+        patientHistory.setRecordDate(LocalDate.now());
 
-        // Mark appointment as complete
-        AppointmentStatus completedStatus = appointmentStatusRepository.findById("COMPLETED")
-                .orElseThrow(() -> new RuntimeException("COMPLETED status not found"));
-        appointment.setAppointmentStatus(completedStatus);
-        appointmentRepository.save(appointment);
+        patientHistoryService.save(patientHistory);
+
         return "redirect:/doctor/appointment/" + id;
     }
 
@@ -240,26 +230,29 @@ public class DoctorController {
             return "redirect:/doclog";
         }
 
-        Patient patient = patientRepository.findByEmail(email);
-        if (patient == null) {
+        Optional<Patient> patientOpt = patientRepository.findById(email);
+        if (patientOpt.isEmpty()) {
             return "redirect:/doctor/patients";
         }
 
-        // Get patient's history
-        List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(patient);
-        
-        // Get patient's prescriptions
-        List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(patient.getId());
-        
-        // Get patient's appointments
-        List<Appointment> appointments = appointmentRepository.findByPerson_Email(patient.getEmail());
+        Patient patient = patientOpt.get();
+        List<Appointment> appointments = appointmentService.findByDoctorId(doctorEmail);
 
-        model.addAttribute("patient", patient);
-        model.addAttribute("patientHistory", patientHistory);
-        model.addAttribute("prescriptions", prescriptions);
-        model.addAttribute("appointments", appointments);
+        // Filter appointments for this patient
+        List<Appointment> patientAppointments = appointments.stream()
+                .filter(a -> a.getPerson() != null && a.getPerson().getEmail().equals(email))
+                .collect(Collectors.toList());
+
+        List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(patient);
+        List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(patient.getId());
+
         Optional<Doctor> doctor = doctorRepository.findById(doctorEmail);
         model.addAttribute("doctor", doctor.get());
+        model.addAttribute("patient", patient);
+        model.addAttribute("appointments", patientAppointments);
+        model.addAttribute("patientHistory", patientHistory);
+        model.addAttribute("prescriptions", prescriptions);
+
         return "doctor/patient-details";
     }
 }

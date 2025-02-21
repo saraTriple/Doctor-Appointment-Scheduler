@@ -177,7 +177,7 @@ public class ControllerClass {
 
     @GetMapping("/userdetails")
     public ModelAndView UserDetails(HttpSession session) {
-        List<Appointment> apps = appointmentService.findByPesonId(session.getAttribute("person").toString());
+        List<Appointment> apps = appointmentService.findByPatientId(Long.valueOf(session.getAttribute("person").toString()));
         Map<String, Object> params = new HashMap<>();
 
         params.put("appointments", apps);

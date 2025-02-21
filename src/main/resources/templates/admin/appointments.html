@@ -1,38 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Appointments List</title>
+    <title>All Appointments</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script>
-        function filterAppointments() {
-            let inputDate = document.getElementById("filterDate").value.toLowerCase();
-            let inputTime = document.getElementById("filterTime").value.toLowerCase();
-            let inputDoctor = document.getElementById("filterDoctor").value.toLowerCase();
-            let inputSpecialization = document.getElementById("filterSpecialization").value.toLowerCase();
-            let inputStatus = document.getElementById("filterStatus").value.toLowerCase();
-
-            let table = document.getElementById("appointmentsTable");
-            let rows = table.getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) {
-                let date = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
-                let time = rows[i].getElementsByTagName("td")[2].innerText.toLowerCase();
-                let doctor = rows[i].getElementsByTagName("td")[3].innerText.toLowerCase();
-                let specialization = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
-                let status = rows[i].getElementsByTagName("td")[5].innerText.toLowerCase();
-
-                if ((date.includes(inputDate) || inputDate === "") &&
-                    (time.includes(inputTime) || inputTime === "") &&
-                    (doctor.includes(inputDoctor) || inputDoctor === "") &&
-                    (specialization.includes(inputSpecialization) || inputSpecialization === "") &&
-                    (status.includes(inputStatus) || inputStatus === "")) {
-                    rows[i].style.display = "";
-                } else {
-                    rows[i].style.display = "none";
-                }
-            }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .table-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-    </script>
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .pagination {
+            margin-bottom: 0;
+        }
+        .page-size-select {
+            width: auto;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -60,11 +53,11 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/admin/patients}">
-                        <i class="fa fa-user-md mr-1"></i> Patients List
+                        <i class="fa fa-user mr-1"></i> Patients List
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/admin/appointments}">
+                    <a class="nav-link active" th:href="@{/admin/appointment-management}">
                         <i class="fa fa-calendar-check mr-1"></i> Appointments List
                     </a>
                 </li>
@@ -78,58 +71,254 @@
     </nav>
 </header>
 
-<div class="container mt-5">
-    <h2 class="text-center">Appointments List</h2>
-
-    <!-- Appointment Filtering -->
-    <div class="row mb-3">
-        <div class="col-md-2">
-            <input type="date" id="filterDate" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Date">
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2><i class="fa fa-calendar-alt"></i> All Appointments</h2>
         </div>
-        <div class="col-md-2">
-            <input type="time" id="filterTime" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Time">
-        </div>
-        <div class="col-md-2">
-            <input type="text" id="filterDoctor" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Doctor Name">
-        </div>
-        <div class="col-md-2">
-            <input type="text" id="filterSpecialization" class="form-control" onkeyup="filterAppointments()" placeholder="Filter by Specialization">
-        </div>
-        <div class="col-md-2">
-            <select id="filterStatus" class="form-control" onchange="filterAppointments()">
-                <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
+        <div class="col-md-6 text-right">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#addAppointmentModal">
+                <i class="fa fa-plus"></i> Schedule New Appointment
+            </button>
         </div>
     </div>
 
-    <!-- List of Appointments -->
-    <table class="table table-bordered" id="appointmentsTable">
-        <thead class="thead-dark">
-        <tr>
-            <th>Appointment ID</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Doctor Name</th>
-            <th>Specialization</th>
-            <th>Status</th>
-            <th>Price</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="appointment : ${appointments}">
-            <td th:text="${appointment.id}"></td>
-            <td th:text="${appointment.date}"></td>
-            <td th:text="${appointment.time}"></td>
-            <td th:text="${appointment.doctorId}"></td>
-            <td th:text="${appointment.docSpecial}"></td>
-            <td th:text="${appointment.status}"></td>
-            <td th:text="${appointment.price}"></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-body">
+            <!-- Filters -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <input type="date" id="filterDate" class="form-control" placeholder="Filter by Date">
+                </div>
+                <div class="col-md-2">
+                    <input type="time" id="filterTime" class="form-control" placeholder="Filter by Time">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="filterDoctor" class="form-control" placeholder="Filter by Doctor">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="filterSpecialization" class="form-control" placeholder="Filter by Specialization">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="filterPatient" class="form-control" placeholder="Filter by Patient">
+                </div>
+                <div class="col-md-2">
+                    <select id="filterStatus" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="SCHEDULED">Scheduled</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                        <option value="NO_SHOW">No Show</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-hover" id="appointmentsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Doctor</th>
+                            <th>Specialization</th>
+                            <th>Patient</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="appointment : ${appointments}">
+                            <td th:text="${#temporals.format(appointment.date, 'dd MMM yyyy')}"></td>
+                            <td th:text="${appointment.time}"></td>
+                            <td th:text="${appointment.doctor.firstName + ' ' + appointment.doctor.lastName}"></td>
+                            <td th:text="${appointment.doctor.specialization}"></td>
+                            <td th:text="${appointment.person.firstName + ' ' + appointment.person.lastName}"></td>
+                            <td>
+                                <span th:class="${'badge ' + 
+                                    (appointment.appointmentStatus.status == 'SCHEDULED' ? 'badge-primary' : 
+                                    (appointment.appointmentStatus.status == 'COMPLETED' ? 'badge-success' : 
+                                    (appointment.appointmentStatus.status == 'CANCELLED' ? 'badge-danger' : 'badge-warning')))}"
+                                    th:text="${appointment.appointmentStatus.status}">
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a th:href="@{/admin/appointment-management/{id}(id=${appointment.id})}" 
+                                       class="btn btn-info btn-sm">
+                                        <i class="fa fa-eye"></i> View
+                                    </a>
+                                    <button th:if="${appointment.appointmentStatus.status == 'SCHEDULED'}"
+                                            class="btn btn-danger btn-sm"
+                                            th:onclick="'cancelAppointment(' + ${appointment.id} + ')'">
+                                        <i class="fa fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="row mt-3">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info" role="status" aria-live="polite">
+                        Showing <span th:text="${appointments.size()}">0</span> appointments
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-7">
+                    <div class="dataTables_paginate paging_simple_numbers">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/appointment-management(page=${currentPage - 1}, size=${pageSize})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${pageNumber == currentPage ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/admin/appointment-management(page=${pageNumber}, size=${pageSize})}"
+                                   th:text="${pageNumber + 1}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/appointment-management(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Add Appointment Modal -->
+<div class="modal fade" id="addAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="addAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAppointmentModalLabel">Schedule New Appointment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form th:action="@{/admin/appointment-management/create}" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="doctor">Doctor</label>
+                        <select class="form-control" id="doctor" name="doctor.email" required>
+                            <option value="">Select Doctor</option>
+                            <option th:each="doctor : ${doctors}"
+                                    th:value="${doctor.email}"
+                                    th:text="${doctor.firstName + ' ' + doctor.lastName + ' (' + doctor.specialization + ')'}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="patient">Patient</label>
+                        <select class="form-control" id="patient" name="person.email" required>
+                            <option value="">Select Patient</option>
+                            <option th:each="patient : ${patients}"
+                                    th:value="${patient.email}"
+                                    th:text="${patient.firstName + ' ' + patient.lastName}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="time" class="form-control" id="time" name="time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" id="price" name="price" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelConfirmModal" tabindex="-1" role="dialog" aria-labelledby="cancelConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelConfirmModalLabel">Confirm Cancellation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this appointment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function filterAppointments() {
+        let inputDate = document.getElementById("filterDate").value.toLowerCase();
+        let inputTime = document.getElementById("filterTime").value.toLowerCase();
+        let inputDoctor = document.getElementById("filterDoctor").value.toLowerCase();
+        let inputPatient = document.getElementById("filterPatient").value.toLowerCase();
+        let inputStatus = document.getElementById("filterStatus").value.toLowerCase();
+        let inputSpecialization = document.getElementById("filterSpecialization").value.toLowerCase();
+
+        let table = document.getElementById("appointmentsTable");
+        let rows = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < rows.length; i++) {
+            let date = rows[i].getElementsByTagName("td")[0].innerText.toLowerCase();
+            let time = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
+            let doctor = rows[i].getElementsByTagName("td")[2].innerText.toLowerCase();
+            let specialization = rows[i].getElementsByTagName("td")[3].innerText.toLowerCase();
+            let patient = rows[i].getElementsByTagName("td")[4].innerText.toLowerCase();
+            let status = rows[i].getElementsByTagName("td")[5].innerText.toLowerCase();
+
+            let matchesFilter = true;
+            if (inputDate && !date.includes(inputDate)) matchesFilter = false;
+            if (inputTime && !time.includes(inputTime)) matchesFilter = false;
+            if (inputDoctor && !doctor.includes(inputDoctor)) matchesFilter = false;
+            if (inputSpecialization && !specialization.includes(inputSpecialization)) matchesFilter = false;
+            if (inputPatient && !patient.includes(inputPatient)) matchesFilter = false;
+            if (inputStatus && !status.includes(inputStatus)) matchesFilter = false;
+
+            rows[i].style.display = matchesFilter ? "" : "none";
+        }
+    }
+
+    let selectedAppointmentId = null;
+
+    function cancelAppointment(id) {
+        selectedAppointmentId = id;
+        $('#cancelConfirmModal').modal('show');
+    }
+
+    function confirmCancel() {
+        if (selectedAppointmentId) {
+            window.location.href = '/admin/appointment-management/' + selectedAppointmentId + '/cancel';
+        }
+    }
+
+    // Add event listeners for filters
+    document.getElementById("filterDate").addEventListener("change", filterAppointments);
+    document.getElementById("filterTime").addEventListener("change", filterAppointments);
+    document.getElementById("filterDoctor").addEventListener("keyup", filterAppointments);
+    document.getElementById("filterSpecialization").addEventListener("keyup", filterAppointments);
+    document.getElementById("filterPatient").addEventListener("keyup", filterAppointments);
+    document.getElementById("filterStatus").addEventListener("change", filterAppointments);
+</script>
 </body>
 </html>

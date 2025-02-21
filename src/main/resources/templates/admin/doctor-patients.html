@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>All Patients</title>
+    <title>Doctor's Patients</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script>
         function filterPatients() {
             let inputName = document.getElementById("filterName").value.toLowerCase();
             let inputEmail = document.getElementById("filterEmail").value.toLowerCase();
-            let inputPhone = document.getElementById("filterPhone").value.toLowerCase();
-            let inputDoctor = document.getElementById("filterDoctor").value.toLowerCase();
 
             let table = document.getElementById("patientsTable");
             let rows = table.getElementsByTagName("tr");
@@ -17,13 +15,9 @@
             for (let i = 1; i < rows.length; i++) {
                 let name = rows[i].getElementsByTagName("td")[0].innerText.toLowerCase();
                 let email = rows[i].getElementsByTagName("td")[1].innerText.toLowerCase();
-                let phone = rows[i].getElementsByTagName("td")[2].innerText.toLowerCase();
-                let doctor = rows[i].getElementsByTagName("td")[3].innerText.toLowerCase();
 
                 if ((name.includes(inputName) || inputName === "") &&
-                    (email.includes(inputEmail) || inputEmail === "") &&
-                    (phone.includes(inputPhone) || inputPhone === "") &&
-                    (doctor.includes(inputDoctor) || inputDoctor === "")) {
+                    (email.includes(inputEmail) || inputEmail === "")) {
                     rows[i].style.display = "";
                 } else {
                     rows[i].style.display = "none";
@@ -57,7 +51,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/admin/patients}">
+                    <a class="nav-link" th:href="@{/admin/patients}">
                         <i class="fa fa-user mr-1"></i> Patients List
                     </a>
                 </li>
@@ -76,30 +70,24 @@
     </nav>
 </header>
 
-<div class="container-fluid mt-5">
-    <h2 class="text-center mb-4">All Patients</h2>
-
-    <!-- Patient Filtering -->
+<div class="container mt-5">
     <div class="row mb-4">
-        <div class="col-md-3">
-            <input type="text" id="filterName" class="form-control" onkeyup="filterPatients()" placeholder="Filter by Name">
-        </div>
-        <div class="col-md-3">
-            <input type="text" id="filterEmail" class="form-control" onkeyup="filterPatients()" placeholder="Filter by Email">
-        </div>
-        <div class="col-md-3">
-            <input type="text" id="filterPhone" class="form-control" onkeyup="filterPatients()" placeholder="Filter by Phone">
-        </div>
-        <div class="col-md-3">
-            <input type="text" id="filterDoctor" class="form-control" onkeyup="filterPatients()" placeholder="Filter by Doctor">
+        <div class="col">
+            <h2 class="text-center">
+                Patients of Dr. <span th:text="${doctor.name}"></span>
+                <small class="text-muted">(<span th:text="${doctor.specialization}"></span>)</small>
+            </h2>
         </div>
     </div>
 
-    <!-- Add New Patient Button -->
-    <div class="text-right mb-3">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#addPatientModal">
-            <i class="fas fa-plus"></i> Add New Patient
-        </button>
+    <!-- Patient Filtering -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input type="text" id="filterName" class="form-control" onkeyup="filterPatients()" placeholder="Filter by Name">
+        </div>
+        <div class="col-md-6">
+            <input type="text" id="filterEmail" class="form-control" onkeyup="filterPatients()" placeholder="Filter by Email">
+        </div>
     </div>
 
     <!-- Patients Table -->
@@ -110,7 +98,6 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Primary Doctor</th>
                 <th>Last Visit</th>
                 <th>Actions</th>
             </tr>
@@ -120,7 +107,6 @@
                 <td th:text="${patient.firstName + ' ' + patient.lastName}"></td>
                 <td th:text="${patient.email}"></td>
                 <td th:text="${patient.phoneNumber}"></td>
-                <td th:text="${patient.primaryDoctor != null ? patient.primaryDoctor.name + ' (' + patient.primaryDoctor.specialization + ')' : 'Not Assigned'}"></td>
                 <td th:text="${patient.lastVisit != null ? #temporals.format(patient.lastVisit, 'dd MMM yyyy') : 'Never'}"></td>
                 <td>
                     <div class="btn-group" role="group">
@@ -130,12 +116,9 @@
                         <a th:href="@{'/admin/patient/' + ${patient.id} + '/prescriptions'}" class="btn btn-success btn-sm">
                             <i class="fas fa-prescription"></i> Prescriptions
                         </a>
-                        <a th:href="@{'/admin/patient/' + ${patient.id} + '/appointments'}" class="btn btn-primary btn-sm">
+                        <a th:href="@{'/admin/doctor/' + ${doctor.id} + '/patient/' + ${patient.id} + '/appointments'}" class="btn btn-primary btn-sm">
                             <i class="fas fa-calendar-alt"></i> Appointments
                         </a>
-                        <button class="btn btn-warning btn-sm" th:onclick="'editPatient(' + ${patient.id} + ')'">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
                     </div>
                 </td>
             </tr>
@@ -144,62 +127,9 @@
     </div>
 </div>
 
-<!-- Add Patient Modal -->
-<div class="modal fade" id="addPatientModal" tabindex="-1" role="dialog" aria-labelledby="addPatientModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form th:action="@{/admin/patient/add}" method="post">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" class="form-control" id="phone" name="phoneNumber" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="primaryDoctor">Primary Doctor (Optional)</label>
-                        <select class="form-control" id="primaryDoctor" name="primaryDoctorId">
-                            <option value="">Select Primary Doctor</option>
-                            <option th:each="doctor : ${doctors}" 
-                                    th:value="${doctor.id}" 
-                                    th:text="${doctor.name + ' (' + doctor.specialization + ')'}">
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Patient</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- Required JavaScript -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    function editPatient(id) {
-        window.location.href = '/admin/patient/' + id + '/edit';
-    }
-</script>
 </body>
 </html>
