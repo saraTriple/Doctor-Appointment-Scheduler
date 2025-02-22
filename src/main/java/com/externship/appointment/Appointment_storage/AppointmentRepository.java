@@ -49,7 +49,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Page<Appointment> findByDoctor_Email(String email, Pageable pageable);
 
-    Page<Appointment> findByAppointmentStatus_Status(String email, Pageable pageable);
+    Page<Appointment> findByAppointmentStatus_Status(String status, Pageable pageable);
+
+    List<Appointment> findByAppointmentStatus_Status(String status);
+
 
     List<Appointment> findByDoctor_Email(String email);
 
