@@ -19,7 +19,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
@@ -168,7 +171,6 @@ public class ControllerClass {
     }
 
 
-
     @GetMapping("/docdetails")
     public ModelAndView DocDetails(HttpSession session) {
 
@@ -272,8 +274,7 @@ public class ControllerClass {
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by("date").ascending().and(Sort.by("time").ascending()));
 
-        Page<Appointment> appointments = appRepo.findByDoctor_EmailAndDateGreaterThanEqualAndPerson_EmailIsNull(
-                null, LocalDate.now(), pageable);
+        Page<Appointment> appointments = appRepo.findByDateGreaterThanEqualAndPerson_EmailIsNull(LocalDate.now(), pageable);
 
         if (specialty != null || doctorName != null || date != null) {
             appointments = appRepo.findByFilters(
@@ -321,16 +322,16 @@ public class ControllerClass {
 
     @GetMapping("/admin/login")
     public String showAdminLogin() {
-        return "admin/login";
+        return "redirect:/adminlog";
     }
 
     @GetMapping("/doctor/login")
     public String showDoctorLogin() {
-        return "doctor/login";
+        return "redirect:/doclog";
     }
 
     @GetMapping("/patient/login")
     public String showPatientLogin() {
-        return "patient/login";
+        return "redirect:/patlog";
     }
 }

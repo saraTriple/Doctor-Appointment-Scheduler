@@ -42,6 +42,27 @@ public class PatientController {
     @Autowired
     private AppointmentStatusRepository appointmentStatusRepository;
 
+    @GetMapping("/patlog")
+    public String showLoginForm() {
+        return "patlog";
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String email,
+                        @RequestParam String password,
+                        HttpSession session,
+                        Model model) {
+        Optional<Patient> patient = patientRepository.findByEmail(email);
+
+        if (patient.isPresent() && patient.get().getPassword().equals(password)) {
+            session.setAttribute("patient", email);
+            return "redirect:/patient/appointments/my";
+        } else {
+            model.addAttribute("error", "Invalid email or password");
+            return "patlog";
+        }
+    }
+
     // My Appointments Page
     @GetMapping("/appointments/my")
     public String showMyAppointments(HttpSession session, Model model) {
@@ -221,10 +242,10 @@ public class PatientController {
         }
 
         Appointment appointment = appointmentOpt.get();
-        
+
         // Check if this appointment belongs to the logged-in patient
-        if (appointment.getPerson() == null || 
-            !appointment.getPerson().getEmail().equals(patientEmail)) {
+        if (appointment.getPerson() == null ||
+                !appointment.getPerson().getEmail().equals(patientEmail)) {
             return ResponseEntity.badRequest()
                     .body("You can only cancel your own appointments");
         }
@@ -232,10 +253,10 @@ public class PatientController {
         // Reset the appointment
         appointment.setPerson(null);
         appointment.setAppointmentStatus(
-            appointmentStatusRepository.findByStatus("AVAILABLE")
-                .orElseThrow(() -> new RuntimeException("Status not found"))
+                appointmentStatusRepository.findByStatus("AVAILABLE")
+                        .orElseThrow(() -> new RuntimeException("Status not found"))
         );
-        
+
         appointmentRepository.save(appointment);
 
         return ResponseEntity.ok()

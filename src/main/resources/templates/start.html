@@ -1,70 +1,496 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title>Hospital Management System</title>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="my-login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiMed Hospitals</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(13, 110, 253, 0.9), rgba(13, 110, 253, 0.7)),
+            url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .feature-card {
+            border: none;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .stats-section {
+            background: var(--light-bg);
+            padding: 80px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .news-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .social-links a {
+            color: white;
+            margin-right: 15px;
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 24px;
+            color: var(--primary-color) !important;
+        }
+
+        .testimonial-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .video-testimonial {
+            transition: transform 0.3s ease;
+        }
+
+        .video-testimonial:hover {
+            transform: translateY(-5px);
+        }
+
+        .trust-indicator {
+            transition: transform 0.3s ease;
+        }
+
+        .trust-indicator:hover {
+            transform: translateY(-5px);
+        }
+
+        .counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .cta-box {
+            background: linear-gradient(45deg, #0d6efd, #0a58ca);
+            transition: transform 0.3s ease;
+        }
+
+        .cta-box:hover {
+            transform: scale(1.02);
+        }
+    </style>
 </head>
 <body>
 
 <!-- Navigation Bar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	<div class="container">
-		<a class="navbar-brand" href="#">DIGIMED HOSPITALS</a>
-		<div class="ml-auto">
-			<a th:href="@{/doclog}" class="btn btn-outline-primary">Login as Doctor</a>
-			<a th:href="@{/patlog}" class="btn btn-outline-primary">Login as Person</a>
-			<a th:href="@{/adminlog}" class="btn btn-outline-danger">Login as Admin</a>
-		</div>
-	</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">DIGIMED HOSPITALS</a>
+        <div class="ms-auto">
+            <a th:href="@{/doclog}" class="btn btn-outline-primary me-2">Doctor Login</a>
+            <a th:href="@{/patlog}" class="btn btn-outline-primary me-2">Patient Login</a>
+            <a th:href="@{/adminlog}" class="btn btn-outline-danger">Admin Login</a>
+        </div>
+    </div>
 </nav>
 
 <!-- Hero Section -->
-<header class="hero bg-primary text-white text-center py-5">
-	<div class="container">
-		<h1 class="display-4">Welcome to DigiMed</h1>
-		<p class="lead">10000+ Healing Hands | Advanced Treatment | Best Clinical Outcomes</p>
-	</div>
-</header>
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 text-center text-lg-start">
+                <h1 class="display-4 mb-4">Welcome to DigiMed</h1>
+                <p class="lead mb-4">10000+ Healing Hands | Advanced Treatment | Best Clinical Outcomes</p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <a href="#features" class="btn btn-light btn-lg">Our Services</a>
+                    <a href="#contact" class="btn btn-outline-light btn-lg">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Why Choose DigiMed Section -->
 <section class="container py-5">
-	<div class="row">
-		<div class="col-md-6">
-			<h2>Why Choose DigiMed Healthcare?</h2>
-			<p>Largest network of the world's finest and brightest medical experts.</p>
-		</div>
-		<div class="col-md-6">
-			<img src="doc.png" alt="img1" width="700" height="610"/>
-		</div>
-	</div>
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Why Choose DigiMed Healthcare?</h2>
+            <div class="mb-4">
+                <h5><i class="fas fa-check-circle text-primary me-2"></i> Expert Doctors</h5>
+                <p>Access to the world's finest and brightest medical experts.</p>
+            </div>
+            <div class="mb-4">
+                <h5><i class="fas fa-check-circle text-primary me-2"></i> Advanced Technology</h5>
+                <p>State-of-the-art medical equipment and facilities.</p>
+            </div>
+            <div class="mb-4">
+                <h5><i class="fas fa-check-circle text-primary me-2"></i> 24/7 Support</h5>
+                <p>Round-the-clock medical assistance and emergency care.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="doc.png" alt="Healthcare professionals" class="img-fluid rounded shadow"/>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">10000+</div>
+                    <div>Medical Experts</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div>Specialties</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div>Emergency Care</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">100k+</div>
+                    <div>Happy Patients</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- News Feeds -->
-<section class="bg-light py-5">
-	<div class="container">
-		<h2 class="text-center">News Feeds</h2>
-		<div class="row">
-			<div class="col-md-4">
-				<h4>Stop The Stroke!</h4>
-				<p>Early detection saves lives. Learn more about stroke prevention.</p>
-			</div>
-			<div class="col-md-4">
-				<h4>DigiMed Never Sleeps</h4>
-				<p>24/7 emergency care available. Call our ambulance service.</p>
-			</div>
-			<div class="col-md-4">
-				<h4>Heart Institute Expertise</h4>
-				<p>World-class cardiac treatments and procedures.</p>
-			</div>
-		</div>
-	</div>
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Latest News</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="news-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h4>Stop The Stroke!</h4>
+                    <p>Early detection saves lives. Learn more about stroke prevention and our advanced treatment
+                        options.</p>
+                    <a href="#" class="btn btn-outline-primary">Read More</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="news-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ambulance"></i>
+                    </div>
+                    <h4>DigiMed Never Sleeps</h4>
+                    <p>24/7 emergency care available. Our ambulance service ensures quick response in critical
+                        situations.</p>
+                    <a href="#" class="btn btn-outline-primary">Read More</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="news-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h4>Heart Institute Expertise</h4>
+                    <p>World-class cardiac treatments and procedures with the latest technology and expert care.</p>
+                    <a href="#" class="btn btn-outline-primary">Read More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">What Our Patients Say</h2>
+
+        <!-- Testimonial Cards -->
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card bg-white p-4 rounded-3 shadow-sm h-100">
+                    <div class="testimonial-rating mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <p class="testimonial-text mb-4">
+                        "I had an exceptional experience at DigiMed Hospital. The online appointment booking was
+                        seamless,
+                        and Dr. Sarah Thompson provided excellent care. The staff was professional and caring throughout
+                        my treatment."
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                             alt="Patient"
+                             class="rounded-circle me-3"
+                             width="60" height="60">
+                        <div>
+                            <h5 class="mb-1">Michael Anderson</h5>
+                            <p class="text-muted mb-0">Cardiac Patient</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card bg-white p-4 rounded-3 shadow-sm h-100">
+                    <div class="testimonial-rating mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <p class="testimonial-text mb-4">
+                        "The pediatric department at DigiMed is outstanding! Dr. James Wilson was so patient with my
+                        daughter.
+                        The child-friendly environment and quick appointment scheduling made our visits stress-free."
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg"
+                             alt="Patient"
+                             class="rounded-circle me-3"
+                             width="60" height="60">
+                        <div>
+                            <h5 class="mb-1">Emily Rodriguez</h5>
+                            <p class="text-muted mb-0">Parent of Patient</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card bg-white p-4 rounded-3 shadow-sm h-100">
+                    <div class="testimonial-rating mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                    </div>
+                    <p class="testimonial-text mb-4">
+                        "The orthopedic team at DigiMed is exceptional. After my knee surgery, the recovery process was
+                        well-managed with regular follow-ups. The online portal made it easy to track my progress."
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <img src="https://randomuser.me/api/portraits/men/55.jpg"
+                             alt="Patient"
+                             class="rounded-circle me-3"
+                             width="60" height="60">
+                        <div>
+                            <h5 class="mb-1">Robert Chen</h5>
+                            <p class="text-muted mb-0">Orthopedic Patient</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Testimonials -->
+        <div class="row mt-5">
+            <div class="col-12 text-center mb-4">
+                <h3>Patient Success Stories</h3>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="video-testimonial bg-white p-4 rounded-3 shadow-sm">
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe src="https://www.youtube.com/embed/your-video-id"
+                                title="Patient Story"
+                                allowfullscreen></iframe>
+                    </div>
+                    <h5>Recovery Journey: Sarah's Story</h5>
+                    <p class="text-muted">Watch how Sarah recovered from her heart surgery at DigiMed</p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="video-testimonial bg-white p-4 rounded-3 shadow-sm">
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe src="https://www.youtube.com/embed/your-video-id-2"
+                                title="Patient Story"
+                                allowfullscreen></iframe>
+                    </div>
+                    <h5>Life-Changing Care: John's Experience</h5>
+                    <p class="text-muted">See how our advanced treatments helped John walk again</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Indicators -->
+        <div class="row mt-5">
+            <div class="col-12 text-center mb-4">
+                <h3>Why Patients Trust Us</h3>
+            </div>
+            <div class="col-md-3 mb-4 text-center">
+                <div class="trust-indicator p-3">
+                    <i class="fas fa-certificate text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <h4 class="counter">98%</h4>
+                    <p>Patient Satisfaction</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4 text-center">
+                <div class="trust-indicator p-3">
+                    <i class="fas fa-user-md text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <h4 class="counter">50+</h4>
+                    <p>Certified Specialists</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4 text-center">
+                <div class="trust-indicator p-3">
+                    <i class="fas fa-procedures text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <h4 class="counter">10000+</h4>
+                    <p>Successful Treatments</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4 text-center">
+                <div class="trust-indicator p-3">
+                    <i class="fas fa-award text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <h4 class="counter">15+</h4>
+                    <p>Years of Excellence</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <div class="cta-box bg-primary text-white p-5 rounded-3">
+                    <h3 class="mb-4">Ready to Experience Our Care?</h3>
+                    <p class="mb-4">Join thousands of satisfied patients who have chosen DigiMed for their healthcare
+                        needs.</p>
+                    <a href="/appointments" class="btn btn-light btn-lg px-4">Book an Appointment</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Footer -->
-<footer class="bg-dark text-white text-center py-3">
-	OOAD MiniProject - Hospital Management System
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5>Contact Us</h5>
+                <p><i class="fas fa-phone me-2"></i> Emergency: +1 234 567 890</p>
+                <p><i class="fas fa-envelope me-2"></i> info@digimed.com</p>
+                <p><i class="fas fa-map-marker-alt me-2"></i> 123 Healthcare Ave, Medical City</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white text-decoration-none">About Us</a></li>
+                    <li><a href="#" class="text-white text-decoration-none">Our Services</a></li>
+                    <li><a href="#" class="text-white text-decoration-none">Find a Doctor</a></li>
+                    <li><a href="#" class="text-white text-decoration-none">Emergency Care</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Connect With Us</h5>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="mt-4 mb-3">
+        <div class="text-center">
+            <p class="mb-0">OOAD MiniProject - Hospital Management System</p>
+        </div>
+    </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

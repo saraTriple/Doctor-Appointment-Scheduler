@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .main-container {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .btn-action {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .quick-access-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-access-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+        .modal-header {
+            background: linear-gradient(45deg, #0d6efd, #0a58ca);
+        }
+
+        .form-floating > .form-select,
+        .form-floating > .form-control {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">DigiMed Hospitals</a>
+        <div class="ms-auto">
+            <a th:href="@{/doclog}" class="btn btn-outline-primary me-2">Doctor Portal</a>
+            <a th:href="@{/adminlog}" class="btn btn-outline-danger">Admin Portal</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container main-container">
+    <!-- Quick Access Buttons Section -->
+    <div class="container mt-4 mb-5">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="quick-access-card h-100 bg-white rounded-3 shadow-sm p-4 text-center">
+                    <div class="icon-wrapper mb-3">
+                        <i class="fas fa-calendar-check text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="mb-3">Available Appointments</h3>
+                    <p class="text-muted mb-4">View and book available appointments across all departments. Check
+                        real-time schedules and secure your slot instantly.</p>
+                    <a href="/available-appointments" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search me-2"></i>Browse Appointments
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="quick-access-card h-100 bg-white rounded-3 shadow-sm p-4 text-center">
+                    <div class="icon-wrapper mb-3">
+                        <i class="fas fa-user-md text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="mb-3">Find Doctors</h3>
+                    <p class="text-muted mb-4">Search and filter through our network of qualified doctors by specialty,
+                        availability, and ratings.</p>
+                    <button type="button" class="btn btn-primary btn-lg w-100" data-bs-toggle="modal"
+                            data-bs-target="#findDoctorsModal">
+                        <i class="fas fa-filter me-2"></i>Search Doctors
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Login Section -->
+        <div class="col-md-6">
+            <div class="login-container">
+                <div class="text-center mb-4">
+                    <h2>Patient Portal</h2>
+                    <p class="text-muted">Please login to access your account</p>
+                </div>
+
+                <form th:action="@{/patient/login}" method="post">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+
+                    <div class="text-center">
+                        <p class="mb-0">Don't have an account? <a th:href="@{/patient/register}">Register here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="col-md-6">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h4>Find Doctors</h4>
+                <p>Search and connect with the best doctors in your area. Filter by specialty, location, and
+                    availability.</p>
+                <a th:href="@{/doctors}" class="btn btn-outline-primary btn-action">Browse Doctors</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h4>Book Appointments</h4>
+                <p>Schedule appointments with your preferred doctors at your convenience. View available time slots and
+                    book instantly.</p>
+                <a th:href="@{/appointments}" class="btn btn-outline-primary btn-action">View Available Appointments</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-notes-medical"></i>
+                </div>
+                <h4>Medical Records</h4>
+                <p>Access your medical history, prescriptions, and test results securely after logging in.</p>
+                <button class="btn btn-outline-primary btn-action" disabled>Login to Access</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Find Doctors Modal -->
+<div class="modal fade" id="findDoctorsModal" tabindex="-1" aria-labelledby="findDoctorsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="findDoctorsModalLabel">Find Your Doctor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/doctors/search" method="get" id="doctorSearchForm">
+                    <div class="row g-3">
+                        <!-- Search by Name -->
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="doctorName" name="name"
+                                       placeholder="Doctor's Name">
+                                <label for="doctorName">Search by Doctor's Name</label>
+                            </div>
+                        </div>
+
+                        <!-- Specialty Filter -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="specialty" name="specialty">
+                                    <option value="">All Specialties</option>
+                                    <option value="cardiology">Cardiology</option>
+                                    <option value="dermatology">Dermatology</option>
+                                    <option value="neurology">Neurology</option>
+                                    <option value="orthopedics">Orthopedics</option>
+                                    <option value="pediatrics">Pediatrics</option>
+                                    <option value="psychiatry">Psychiatry</option>
+                                </select>
+                                <label for="specialty">Specialty</label>
+                            </div>
+                        </div>
+
+                        <!-- Availability Filter -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="availability" name="availability">
+                                    <option value="">Any Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="this-week">This Week</option>
+                                    <option value="next-week">Next Week</option>
+                                </select>
+                                <label for="availability">Availability</label>
+                            </div>
+                        </div>
+
+                        <!-- Gender Filter -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="">Any Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                                <label for="gender">Doctor's Gender</label>
+                            </div>
+                        </div>
+
+                        <!-- Experience Filter -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="experience" name="experience">
+                                    <option value="">Any Experience</option>
+                                    <option value="0-5">0-5 Years</option>
+                                    <option value="5-10">5-10 Years</option>
+                                    <option value="10+">10+ Years</option>
+                                </select>
+                                <label for="experience">Experience</label>
+                            </div>
+                        </div>
+
+                        <!-- Rating Filter -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="rating" name="rating">
+                                    <option value="">Any Rating</option>
+                                    <option value="4+">4+ Stars</option>
+                                    <option value="3+">3+ Stars</option>
+                                </select>
+                                <label for="rating">Minimum Rating</label>
+                            </div>
+                        </div>
+
+                        <!-- Language Filter -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="language" name="language">
+                                    <option value="">Any Language</option>
+                                    <option value="english">English</option>
+                                    <option value="spanish">Spanish</option>
+                                    <option value="french">French</option>
+                                </select>
+                                <label for="language">Language</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="doctorSearchForm" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Search Doctors
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
