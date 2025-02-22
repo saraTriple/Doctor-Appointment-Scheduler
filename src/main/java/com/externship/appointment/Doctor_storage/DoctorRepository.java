@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface DoctorRepository extends JpaRepository<Doctor,String> {
     @Query("SELECT d FROM Doctor d WHERE " +
            "(:name IS NULL OR LOWER(d.name) LIKE LOWER(CONCAT('%', :name, '%')) ) AND " +
@@ -18,4 +20,6 @@ public interface DoctorRepository extends JpaRepository<Doctor,String> {
         @Param("degree") String degree,
         Pageable pageable
     );
+
+    List<Doctor> findBySpecialization(String specialization);
 }

@@ -3,6 +3,7 @@
 <head>
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 <header>
@@ -30,12 +31,17 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/admin/patients}">
-                        <i class="fa fa-user-md mr-1"></i> Patients List
+                        <i class="fa fa-user mr-1"></i> Patients List
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/admin/appointments}">
                         <i class="fa fa-calendar-check mr-1"></i> Appointments List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/reports}">
+                        <i class="fa fa-chart-bar mr-1"></i> Reports
                     </a>
                 </li>
                 <li class="nav-item">
@@ -49,8 +55,57 @@
 </header>
 
 <div class="container mt-5">
-    <h2 class="text-center">Admin Dashboard</h2>
-    <p class="text-center">Welcome to the Admin Dashboard. Use the links above to navigate.</p>
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+    
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-md fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Doctors</h5>
+                    <p class="card-text" th:text="${doctorCount ?: '0'}">0</p>
+                    <a href="/admin/doctors" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-user fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title">Patients</h5>
+                    <p class="card-text" th:text="${patientCount ?: '0'}">0</p>
+                    <a href="/admin/patients" class="btn btn-success">View Details</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-check fa-3x mb-3 text-info"></i>
+                    <h5 class="card-title">Appointments</h5>
+                    <p class="card-text" th:text="${appointmentCount ?: '0'}">0</p>
+                    <a href="/admin/appointments" class="btn btn-info">View Details</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-bar fa-3x mb-3 text-warning"></i>
+                    <h5 class="card-title">Reports</h5>
+                    <p class="card-text">Generate Reports</p>
+                    <a href="/admin/reports" class="btn btn-warning">View Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

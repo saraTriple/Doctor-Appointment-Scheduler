@@ -121,7 +121,7 @@ public class ControllerClass {
 
         if (optionalAdmin.isPresent()) {
             Admin admin = optionalAdmin.get();
-            if (passwordEncoder.matches(password, admin.getPassword())) {
+            if (password.equals(admin.getPassword())) {
                 session.setAttribute("admin", email);
                 return "redirect:/adminDashboard"; // Successful login
             }

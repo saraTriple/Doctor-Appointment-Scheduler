@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Reports</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" th:href="@{/admin/home}">
+            <i class="fas fa-chart-line mr-2"></i>
+            Admin Reports
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/home}">
+                        <i class="fas fa-home mr-1"></i> Dashboard
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Generate Reports</h2>
+    
+    <div class="row">
+        <!-- Appointments Report -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-calendar-check text-primary mr-2"></i>
+                        Appointments Report
+                    </h5>
+                    <p class="card-text">Generate detailed report of all appointments</p>
+                    <form th:action="@{/admin/reports/appointments}" method="get" class="mt-3">
+                        <div class="form-group">
+                            <label for="appointmentDateRange">Date Range:</label>
+                            <select class="form-control" id="appointmentDateRange" name="range">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" name="format" value="excel" class="btn btn-success mr-2">
+                                <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                            </button>
+                            <button type="submit" name="format" value="pdf" class="btn btn-danger">
+                                <i class="fas fa-file-pdf mr-1"></i> Export to PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Doctors Report -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-user-md text-success mr-2"></i>
+                        Doctors Report
+                    </h5>
+                    <p class="card-text">Generate detailed report of all doctors and their appointments</p>
+                    <form th:action="@{/admin/reports/doctors}" method="get" class="mt-3">
+                        <div class="form-group">
+                            <label for="doctorSpecialty">Specialty:</label>
+                            <select class="form-control" id="doctorSpecialty" name="specialty">
+                                <option value="all">All Specialties</option>
+                                <option th:each="specialty : ${specialties}"
+                                        th:value="${specialty}"
+                                        th:text="${specialty}">Specialty</option>
+                            </select>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" name="format" value="excel" class="btn btn-success mr-2">
+                                <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                            </button>
+                            <button type="submit" name="format" value="pdf" class="btn btn-danger">
+                                <i class="fas fa-file-pdf mr-1"></i> Export to PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Patients Report -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-user text-info mr-2"></i>
+                        Patients Report
+                    </h5>
+                    <p class="card-text">Generate detailed report of all patients and their appointments</p>
+                    <form th:action="@{/admin/reports/patients}" method="get" class="mt-3">
+                        <div class="form-group">
+                            <label for="patientDateRange">Registration Date:</label>
+                            <select class="form-control" id="patientDateRange" name="range">
+                                <option value="month">Last Month</option>
+                                <option value="quarter">Last Quarter</option>
+                                <option value="year">Last Year</option>
+                                <option value="all">All Time</option>
+                            </select>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" name="format" value="excel" class="btn btn-success mr-2">
+                                <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                            </button>
+                            <button type="submit" name="format" value="pdf" class="btn btn-danger">
+                                <i class="fas fa-file-pdf mr-1"></i> Export to PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
