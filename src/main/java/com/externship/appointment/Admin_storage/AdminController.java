@@ -50,25 +50,18 @@ public class AdminController {
 
     // Main Admin Dashboard
     @GetMapping("/dashboard")
-    public ModelAndView adminDashboard(HttpSession session, Model model) {
+    public ModelAndView adminDashboard(HttpSession session) {
         if (session.getAttribute("admin") == null) {
             return new ModelAndView("redirect:/fail_login");
         }
 
-        model.addAttribute("doctorCount", doctorService.count());
-        model.addAttribute("patientCount", patientService.count());
-        model.addAttribute("appointmentCount", appointmentService.count());
-        model.addAttribute("totalRevenue", appointmentService.calculateTotalRevenue());
-
-        // For charts
-        model.addAttribute("statusData", appointmentService.getAppointmentStatusCounts());
-        model.addAttribute("revenueDates", appointmentService.getRevenueDates());
-        model.addAttribute("revenueData", appointmentService.getRevenueData());
-
-        // For filters
-        model.addAttribute("doctors", doctorService.findAll());
-        model.addAttribute("specialties", doctorService.getAllSpecialties());
-        return new ModelAndView("admin/admin-dashboard");
+        ModelAndView modelAndView = new ModelAndView("admin/admin-dashboard");
+        modelAndView.addObject("doctorCount", doctorService.count());
+        modelAndView.addObject("patientCount", patientService.count());
+        modelAndView.addObject("appointmentCount", appointmentService.count());
+        modelAndView.addObject("totalRevenue", appointmentService.calculateTotalRevenue());
+        
+        return modelAndView;
     }
 
     // Appointments List Page with Pagination

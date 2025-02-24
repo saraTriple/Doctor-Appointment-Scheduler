@@ -137,6 +137,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByDoctorAndDateBetween(Doctor doctor, LocalDate startDate, LocalDate endDate);
 
+    List<Appointment> findByAppointmentStatus_StatusAndDateBetween(String status, LocalDate startDate, LocalDate endDate);
+
     /**
      * Finds appointments based on the specified filters.
      *

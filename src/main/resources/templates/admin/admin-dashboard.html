@@ -114,163 +114,111 @@
         <div class="col-md-3">
             <div class="dashboard-card stats-card p-3 text-center">
                 <i class="fas fa-dollar-sign card-icon"></i>
-                <h3 th:text="${totalRevenue}">$0</h3>
+                <h3>$<span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 2, 'POINT')}">0.00</span></h3>
                 <p class="mb-0">Total Revenue</p>
             </div>
         </div>
     </div>
 
-    <!-- Reports Section -->
-    <div class="report-section">
-        <h3 class="mb-4">Quick Reports</h3>
-        <div class="row g-4">
-            <!-- Income Report -->
-            <div class="col-md-4">
-                <div class="dashboard-card p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Income Report</h5>
-                        <i class="fas fa-dollar-sign card-icon"></i>
-                    </div>
-                    <form action="/admin/reports/income" method="GET" target="_blank">
-                        <div class="mb-3">
-                            <label class="form-label">Date Range</label>
-                            <input type="text" class="form-control daterange" name="dateRange" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Doctor</label>
-                            <select class="form-select" name="doctorId">
-                                <option value="">All Doctors</option>
-                                <option th:each="doctor : ${doctors}" 
-                                        th:value="${doctor.email}"
-                                        th:text="${doctor.name}">Doctor Name</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Generate Report</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Appointment Status Report -->
-            <div class="col-md-4">
-                <div class="dashboard-card p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Status Report</h5>
-                        <i class="fas fa-chart-pie card-icon"></i>
-                    </div>
-                    <form action="/admin/reports/status" method="GET" target="_blank">
-                        <div class="mb-3">
-                            <label class="form-label">Date Range</label>
-                            <input type="text" class="form-control daterange" name="dateRange" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" name="status">
-                                <option value="">All Statuses</option>
-                                <option value="SCHEDULED">Scheduled</option>
-                                <option value="COMPLETED">Completed</option>
-                                <option value="CANCELLED">Cancelled</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Generate Report</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Doctor Performance Report -->
-            <div class="col-md-4">
-                <div class="dashboard-card p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Performance Report</h5>
-                        <i class="fas fa-user-md card-icon"></i>
-                    </div>
-                    <form action="/admin/reports/performance" method="GET" target="_blank">
-                        <div class="mb-3">
-                            <label class="form-label">Date Range</label>
-                            <input type="text" class="form-control daterange" name="dateRange" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Specialty</label>
-                            <select class="form-select" name="specialty">
-                                <option value="">All Specialties</option>
-                                <option th:each="specialty : ${specialties}"
-                                        th:value="${specialty}"
-                                        th:text="${specialty}">Specialty</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Generate Report</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Section -->
+    <!-- Report Cards -->
     <div class="row g-4">
-        <div class="col-md-6">
-            <div class="dashboard-card p-3">
-                <h5>Appointments by Status</h5>
-                <div class="chart-container">
-                    <canvas id="appointmentStatusChart"></canvas>
+        <!-- Income Report Card -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-chart-line card-icon me-3" style="color: #28a745;"></i>
+                    <h5 class="mb-0">Income Report</h5>
                 </div>
+                <p class="text-muted">Track revenue by doctor, specialty, or date range</p>
+                <a th:href="@{/admin/reports/income(dateRange=${#temporals.format(#temporals.createNow().minusDays(30),'yyyy-MM-dd')} + ' to ' + ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')})}" 
+                   class="btn btn-outline-success w-100">Generate Report</a>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="dashboard-card p-3">
-                <h5>Revenue Trend</h5>
-                <div class="chart-container">
-                    <canvas id="revenueTrendChart"></canvas>
+
+        <!-- Appointment Status Report Card -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-tasks card-icon me-3" style="color: #007bff;"></i>
+                    <h5 class="mb-0">Status Report</h5>
                 </div>
+                <p class="text-muted">View appointment status distribution and trends</p>
+                <a th:href="@{/admin/reports/appointment-status(dateRange=${#temporals.format(#temporals.createNow().minusDays(30),'yyyy-MM-dd')} + ' to ' + ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')})}" 
+                   class="btn btn-outline-primary w-100">Generate Report</a>
+            </div>
+        </div>
+
+        <!-- Doctor Performance Report Card -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-user-md card-icon me-3" style="color: #6f42c1;"></i>
+                    <h5 class="mb-0">Doctor Performance</h5>
+                </div>
+                <p class="text-muted">Analyze doctor workload and efficiency</p>
+                <a th:href="@{/admin/reports/doctor-performance(dateRange=${#temporals.format(#temporals.createNow().minusDays(30),'yyyy-MM-dd')} + ' to ' + ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')})}" 
+                   class="btn btn-outline-purple w-100">Generate Report</a>
+            </div>
+        </div>
+
+        <!-- Specialty Analysis Report Card -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-stethoscope card-icon me-3" style="color: #fd7e14;"></i>
+                    <h5 class="mb-0">Specialty Analysis</h5>
+                </div>
+                <p class="text-muted">Review appointment distribution by specialty</p>
+                <a th:href="@{/admin/reports/specialty-analysis(dateRange=${#temporals.format(#temporals.createNow().minusDays(30),'yyyy-MM-dd')} + ' to ' + ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')})}" 
+                   class="btn btn-outline-warning w-100">Generate Report</a>
+            </div>
+        </div>
+
+        <!-- Time Slot Report Card -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-clock card-icon me-3" style="color: #20c997;"></i>
+                    <h5 class="mb-0">Time Slot Analysis</h5>
+                </div>
+                <p class="text-muted">Analyze popular appointment times</p>
+                <a th:href="@{/admin/reports/timeslot-utilization(dateRange=${#temporals.format(#temporals.createNow().minusDays(30),'yyyy-MM-dd')} + ' to ' + ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')})}" 
+                   class="btn btn-outline-info w-100">Generate Report</a>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    .dashboard-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 10px;
+        background: white;
+        height: 100%;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .card-icon {
+        font-size: 2rem;
+        color: inherit;
+    }
+    .stats-card {
+        background: linear-gradient(45deg, #0d6efd, #0a58ca);
+        color: white;
+    }
+    .btn-outline-purple {
+        color: #6f42c1;
+        border-color: #6f42c1;
+    }
+    .btn-outline-purple:hover {
+        color: #fff;
+        background-color: #6f42c1;
+        border-color: #6f42c1;
+    }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize date pickers
-        flatpickr(".daterange", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            maxDate: "today"
-        });
-
-        // Initialize charts
-        const statusCtx = document.getElementById('appointmentStatusChart').getContext('2d');
-        new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Scheduled', 'Completed', 'Cancelled'],
-                datasets: [{
-                    data: [[${statusData}]],
-                    backgroundColor: ['#0d6efd', '#198754', '#dc3545']
-                }]
-            }
-        });
-
-        const revenueCtx = document.getElementById('revenueTrendChart').getContext('2d');
-        new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: [[${revenueDates}]],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [[${revenueData}]],
-                    borderColor: '#0d6efd',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
-</script>
 </body>
 </html>

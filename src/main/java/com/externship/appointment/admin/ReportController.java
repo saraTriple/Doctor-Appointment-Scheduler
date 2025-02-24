@@ -41,12 +41,15 @@ public class ReportController {
     // 1. Income Report by Doctor
     @GetMapping("/income")
     public ResponseEntity<byte[]> generateIncomeReport(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam String dateRange,
             @RequestParam(required = false) String specialty,
             @RequestParam(required = false) String doctorId,
-            @RequestParam String format
+            @RequestParam(defaultValue = "pdf") String format
     ) {
+        String[] dates = dateRange.split(" to ");
+        LocalDate startDate = LocalDate.parse(dates[0]);
+        LocalDate endDate = LocalDate.parse(dates[1]);
+
         List<Appointment> appointments = appointmentRepository.findByDateBetween(startDate, endDate);
 
         // Apply filters
@@ -72,11 +75,21 @@ public class ReportController {
     // 2. Appointment Status Report
     @GetMapping("/appointment-status")
     public ResponseEntity<byte[]> generateStatusReport(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam String format
+            @RequestParam String dateRange,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "pdf") String format
     ) {
+        String[] dates = dateRange.split(" to ");
+        LocalDate startDate = LocalDate.parse(dates[0]);
+        LocalDate endDate = LocalDate.parse(dates[1]);
+
         List<Appointment> appointments = appointmentRepository.findByDateBetween(startDate, endDate);
+
+        if (status != null) {
+            appointments = appointments.stream()
+                    .filter(a -> a.getAppointmentStatus().getStatus().equals(status))
+                    .collect(Collectors.toList());
+        }
 
         Map<String, Long> statusCounts = appointments.stream()
                 .collect(Collectors.groupingBy(
@@ -94,11 +107,14 @@ public class ReportController {
     // 3. Doctor Performance Report
     @GetMapping("/doctor-performance")
     public ResponseEntity<byte[]> generateDoctorPerformanceReport(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam String dateRange,
             @RequestParam(required = false) String specialty,
-            @RequestParam String format
+            @RequestParam(defaultValue = "pdf") String format
     ) {
+        String[] dates = dateRange.split(" to ");
+        LocalDate startDate = LocalDate.parse(dates[0]);
+        LocalDate endDate = LocalDate.parse(dates[1]);
+
         List<Doctor> doctors = doctorRepository.findAll();
         Map<Doctor, List<Appointment>> doctorAppointments = new HashMap<>();
 
