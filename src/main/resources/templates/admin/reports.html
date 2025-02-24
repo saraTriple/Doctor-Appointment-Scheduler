@@ -140,15 +140,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/admin/reports/income" method="GET" target="_blank">
+                    <form id="incomeReportForm" action="/admin/reports/income" method="GET" target="_blank">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Start Date</label>
-                                <input type="date" class="form-control datepicker" name="startDate" required>
+                                <input type="date" class="form-control" name="startDate" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">End Date</label>
-                                <input type="date" class="form-control datepicker" name="endDate" required>
+                                <input type="date" class="form-control" name="endDate" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Specialty</label>
@@ -171,7 +171,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Format</label>
                                 <select class="form-select" name="format" required>
-                                    <option value="excel">Excel</option>
+                                    <option value="xlsx">Excel</option>
                                     <option value="pdf">PDF</option>
                                 </select>
                             </div>
@@ -186,36 +186,177 @@
         </div>
     </div>
 
-    <!-- Similar modals for other reports -->
     <!-- Status Report Modal -->
     <div class="modal fade" id="statusReportModal" tabindex="-1">
-        <!-- Similar structure to income report modal -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Appointment Status Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="statusReportForm" action="/admin/reports/appointment-status" method="GET" target="_blank">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" name="endDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status">
+                                    <option value="">All Statuses</option>
+                                    <option value="SCHEDULED">Scheduled</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Format</label>
+                                <select class="form-select" name="format" required>
+                                    <option value="xlsx">Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="statusReportForm" class="btn btn-primary">Generate Report</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Performance Report Modal -->
     <div class="modal fade" id="performanceReportModal" tabindex="-1">
-        <!-- Similar structure to income report modal -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Doctor Performance Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="performanceReportForm" action="/admin/reports/doctor-performance" method="GET" target="_blank">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" name="endDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Specialty</label>
+                                <select class="form-select" name="specialty">
+                                    <option value="">All Specialties</option>
+                                    <option th:each="specialty : ${specialties}"
+                                            th:value="${specialty}"
+                                            th:text="${specialty}">Specialty</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Format</label>
+                                <select class="form-select" name="format" required>
+                                    <option value="xlsx">Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="performanceReportForm" class="btn btn-primary">Generate Report</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Specialty Report Modal -->
     <div class="modal fade" id="specialtyReportModal" tabindex="-1">
-        <!-- Similar structure to income report modal -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Specialty Analysis Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="specialtyReportForm" action="/admin/reports/specialty-analysis" method="GET" target="_blank">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" name="endDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Format</label>
+                                <select class="form-select" name="format" required>
+                                    <option value="xlsx">Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="specialtyReportForm" class="btn btn-primary">Generate Report</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Time Slot Report Modal -->
     <div class="modal fade" id="timeSlotReportModal" tabindex="-1">
-        <!-- Similar structure to income report modal -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Time Slot Utilization Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="timeSlotReportForm" action="/admin/reports/timeslot-utilization" method="GET" target="_blank">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" name="endDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Format</label>
+                                <select class="form-select" name="format" required>
+                                    <option value="xlsx">Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="timeSlotReportForm" class="btn btn-primary">Generate Report</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize date pickers
-            flatpickr(".datepicker", {
-                dateFormat: "Y-m-d",
-                maxDate: "today"
-            });
+            // No need for flatpickr initialization since we're using native date inputs
 
             // Dynamic specialty loading based on doctor selection
             const doctorSelect = document.querySelector('select[name="doctorId"]');
