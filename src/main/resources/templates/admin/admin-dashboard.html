@@ -72,7 +72,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/reports}">
+                        <a class="nav-link" th:href="@{/admin/dashboard}">
                             <i class="fas fa-file-alt me-1"></i> Reports
                         </a>
                     </li>
@@ -141,7 +141,7 @@
                             <select class="form-select" name="doctorId">
                                 <option value="">All Doctors</option>
                                 <option th:each="doctor : ${doctors}" 
-                                        th:value="${doctor.id}" 
+                                        th:value="${doctor.email}"
                                         th:text="${doctor.name}">Doctor Name</option>
                             </select>
                         </div>

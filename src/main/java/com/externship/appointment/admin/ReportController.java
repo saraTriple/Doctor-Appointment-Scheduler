@@ -3,6 +3,14 @@ package com.externship.appointment.admin;
 import com.externship.appointment.Appointment_storage.Appointment;
 import com.externship.appointment.Appointment_storage.AppointmentRepository;
 import com.externship.appointment.Doctor_storage.Doctor;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -530,9 +538,87 @@ public class ReportController {
             // Add table headers
             Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
             table.addCell(new PdfPCell(new Phrase("Time Slot", headerFont)));
-        } catch (Exception e) {
+            table.addCell(new PdfPCell(new Phrase("Count", headerFont)));
 
+            // Add data rows
+            Font cellFont = new Font(Font.FontFamily.HELVETICA, 10);
+            for (Map.Entry<LocalTime, Long> entry : timeSlotCounts.entrySet()) {
+                table.addCell(new PdfPCell(new Phrase(entry.getKey().toString(), cellFont)));
+                table.addCell(new PdfPCell(new Phrase(String.valueOf(entry.getValue()), cellFont)));
+            }
+
+            document.add(table);
+            document.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "time_slot_report.pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(outputStream.toByteArray());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return null;
+    }
+
+    private ResponseEntity<byte[]> generateExcelPerformanceReport(Map<Doctor, List<Appointment>> doctorAppointments) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Doctor Performance Report");
+
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Doctor Name");
+            headerRow.createCell(1).setCellValue("Specialization");
+            headerRow.createCell(2).setCellValue("Total Appointments");
+            headerRow.createCell(3).setCellValue("Completed");
+            headerRow.createCell(4).setCellValue("Cancelled");
+            headerRow.createCell(5).setCellValue("Revenue");
+
+            int rowNum = 1;
+            for (Map.Entry<Doctor, List<Appointment>> entry : doctorAppointments.entrySet()) {
+                Doctor doctor = entry.getKey();
+                List<Appointment> appointments = entry.getValue();
+
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(doctor.getName());
+                row.createCell(1).setCellValue(doctor.getSpecialization());
+                row.createCell(2).setCellValue(appointments.size());
+
+                long completed = appointments.stream()
+                        .filter(a -> "COMPLETED".equals(a.getAppointmentStatus().getStatus()))
+                        .count();
+                long cancelled = appointments.stream()
+                        .filter(a -> "CANCELLED".equals(a.getAppointmentStatus().getStatus()))
+                        .count();
+                double revenue = appointments.stream()
+                        .filter(a -> "COMPLETED".equals(a.getAppointmentStatus().getStatus()))
+                        .mapToDouble(a -> a.getPrice())
+                        .sum();
+
+                row.createCell(3).setCellValue(completed);
+                row.createCell(4).setCellValue(cancelled);
+                row.createCell(5).setCellValue(revenue);
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < 6; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", "doctor_performance_report.xlsx");
+
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .body(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate Excel report", e);
+        }
     }
 }

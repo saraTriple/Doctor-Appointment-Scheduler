@@ -1,5 +1,6 @@
 package com.externship.appointment.Appointment_storage;
 
+import com.externship.appointment.Doctor_storage.Doctor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -131,6 +132,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Page<Appointment> findByDateAndTimeAndDoctor_EmailAndPerson_EmailIsNull(
             LocalDate date,LocalTime time, String email, Pageable pageable);
+
+    List<Appointment> findByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    List<Appointment> findByDoctorAndDateBetween(Doctor doctor, LocalDate startDate, LocalDate endDate);
+
     /**
      * Finds appointments based on the specified filters.
      *

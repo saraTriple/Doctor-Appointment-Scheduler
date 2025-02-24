@@ -3,8 +3,10 @@ package com.externship.appointment.Admin_storage;
 import com.externship.appointment.Appointment_storage.*;
 import com.externship.appointment.Doctor_storage.Doctor;
 import com.externship.appointment.Doctor_storage.DoctorRepository;
+import com.externship.appointment.Doctor_storage.DoctorService;
 import com.externship.appointment.Patient_storage.Patient;
 import com.externship.appointment.Patient_storage.PatientRepository;
+import com.externship.appointment.Patient_storage.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,9 +42,15 @@ public class AdminController {
     @Autowired
     private AppointmentStatusRepository appointmentStatusRepository;
 
+    @Autowired
+    private DoctorService doctorService;
+
+    @Autowired
+    private PatientService patientService;
+
     // Main Admin Dashboard
     @GetMapping("/dashboard")
-    public ModelAndView adminDashboard(HttpSession session) {
+    public ModelAndView adminDashboard(HttpSession session, Model model) {
         if (session.getAttribute("admin") == null) {
             return new ModelAndView("redirect:/fail_login");
         }
