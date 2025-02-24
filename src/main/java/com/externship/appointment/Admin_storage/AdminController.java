@@ -61,6 +61,10 @@ public class AdminController {
         modelAndView.addObject("appointmentCount", appointmentService.count());
         modelAndView.addObject("totalRevenue", appointmentService.calculateTotalRevenue());
         
+        // Add required data for report filters
+        modelAndView.addObject("doctors", doctorService.findAll());
+        modelAndView.addObject("specialties", doctorService.getAllSpecialties());
+        
         return modelAndView;
     }
 
