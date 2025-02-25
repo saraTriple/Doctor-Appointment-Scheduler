@@ -21,7 +21,7 @@ import java.util.*;
 
 @Component
 @Order(5)
-public class PatientHistoryDataInitializer implements CommandLineRunner {
+public class PatientHistoryDataInitializer extends BaseInitializer {
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -61,8 +61,32 @@ public class PatientHistoryDataInitializer implements CommandLineRunner {
     private final String[] chronicConditions = {"None", "Hypertension", "Diabetes", "Asthma", "Arthritis",
             "Heart Disease", "COPD", "Depression", "Anxiety", "Hypothyroidism"};
 
+
     @Override
-    public void run(String... args) {
+    protected String getInitializerName() {
+        return "PatientInitializer";
+    }
+
+    @Override
+    protected void initialize() {
+        if (!initializationTracker.isInitialized(getInitializerName())) {
+            runInitializer("");
+            initializationTracker.markAsInitialized(getInitializerName());
+        }
+    }
+
+    private void createPatient() {
+        Patient patient = new Patient();
+        patient.setPassword("patient");
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patient.setEmail("patient@example.com");
+        patient.setPhoneNumber("1234567890");
+        patientRepository.save(patient);
+    }
+
+
+    public void runInitializer(String... args) {
         createAppointmentStatuses();
         List<Doctor> doctors = doctorRepository.findAll();
         List<Patient> patients = createPatients();

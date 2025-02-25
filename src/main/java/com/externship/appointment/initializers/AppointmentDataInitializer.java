@@ -11,21 +11,24 @@ import com.externship.appointment.Patient_storage.PatientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @Component
-@Order(7) // Run after patient and doctor initializers
-public class AppointmentDataInitializer implements CommandLineRunner {
+@Order(3)
+public class AppointmentDataInitializer extends BaseInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(AppointmentDataInitializer.class);
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -34,15 +37,23 @@ public class AppointmentDataInitializer implements CommandLineRunner {
     private PatientRepository patientRepository;
 
     @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
     private AppointmentStatusRepository appointmentStatusRepository;
 
     private final Random random = new Random();
 
     @Override
-    public void run(String... args) {
+    protected String getInitializerName() {
+        return "AppointmentDataInitializer";
+    }
+
+    @Override
+    protected void initialize() {
+        if (appointmentRepository.count() == 0) {
+            createAppointments();
+        }
+    }
+
+    private void createAppointments() {
         logger.info("Initializing appointment data...");
 
         // Get all doctors and patients

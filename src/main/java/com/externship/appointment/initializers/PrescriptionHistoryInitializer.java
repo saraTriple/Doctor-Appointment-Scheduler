@@ -1,27 +1,34 @@
 package com.externship.appointment.initializers;
 
+import com.externship.appointment.Doctor_storage.Doctor;
+import com.externship.appointment.Doctor_storage.DoctorRepository;
 import com.externship.appointment.Patient_storage.Patient;
 import com.externship.appointment.Patient_storage.PatientRepository;
 import com.externship.appointment.Prescription_storage.Prescription;
 import com.externship.appointment.Prescription_storage.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Component
-@Order(5)
-public class PrescriptionHistoryInitializer implements CommandLineRunner {
+@Order(6)
+public class PrescriptionHistoryInitializer extends BaseInitializer {
+
+    @Autowired
+    private PrescriptionRepository prescriptionRepository;
 
     @Autowired
     private PatientRepository patientRepository;
 
     @Autowired
-    private PrescriptionRepository prescriptionRepository;
+    private DoctorRepository doctorRepository;
+
+    private final Random random = new Random();
 
     private static final List<String> COMMON_SYMPTOMS = Arrays.asList(
         "Fever and Fatigue", "Chest Pain", "Digestive Issues", "Skin Rash",
@@ -56,7 +63,21 @@ public class PrescriptionHistoryInitializer implements CommandLineRunner {
     );
 
     @Override
-    public void run(String... args) {
+    protected String getInitializerName() {
+        return "PrescriptionHistoryInitializer";
+    }
+
+    @Override
+    protected void initialize() {
+        if (!initializationTracker.isInitialized(getInitializerName())) {
+            if (prescriptionRepository.count() == 0) {
+                createPrescriptionHistories();
+            }
+            initializationTracker.markAsInitialized(getInitializerName());
+        }
+    }
+
+    private void createPrescriptionHistories() {
         List<Patient> patients = patientRepository.findAll();
         for (Patient patient : patients) {
             createPrescriptionHistory(patient);
@@ -65,7 +86,7 @@ public class PrescriptionHistoryInitializer implements CommandLineRunner {
 
     private void createPrescriptionHistory(Patient patient) {
         // Create a prescription from 3 months ago
-        int index = (int) (Math.random() * COMMON_SYMPTOMS.size());
+        int index = random.nextInt(COMMON_SYMPTOMS.size());
         
         Prescription prescription = new Prescription();
         prescription.setPatient(patient);

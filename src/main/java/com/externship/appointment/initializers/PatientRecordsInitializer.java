@@ -1,21 +1,21 @@
 package com.externship.appointment.initializers;
 
-import com.externship.appointment.Appointment_storage.AppointmentStatusRepository;
-import com.externship.appointment.Patient_storage.Patient;
-import com.externship.appointment.Patient_storage.PatientRepository;
-import com.externship.appointment.Patient_history.PatientHistory;
-import com.externship.appointment.Patient_history.PatientHistoryRepository;
-import com.externship.appointment.Prescription_storage.Prescription;
-import com.externship.appointment.Prescription_storage.PrescriptionRepository;
 import com.externship.appointment.Appointment_storage.Appointment;
 import com.externship.appointment.Appointment_storage.AppointmentRepository;
+import com.externship.appointment.Appointment_storage.AppointmentStatus;
+import com.externship.appointment.Appointment_storage.AppointmentStatusRepository;
 import com.externship.appointment.Doctor_storage.Doctor;
 import com.externship.appointment.Doctor_storage.DoctorRepository;
-import com.externship.appointment.Appointment_storage.AppointmentStatus;
+import com.externship.appointment.Patient_history.PatientHistory;
+import com.externship.appointment.Patient_history.PatientHistoryRepository;
+import com.externship.appointment.Patient_storage.Patient;
+import com.externship.appointment.Patient_history.PatientHistory;
+import com.externship.appointment.Patient_storage.PatientRepository;
+import com.externship.appointment.Prescription_storage.Prescription;
+import com.externship.appointment.Prescription_storage.PrescriptionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +23,16 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Component
-@Order(6)
-public class PatientRecordsInitializer implements CommandLineRunner {
+@Order(5)
+public class PatientRecordsInitializer extends BaseInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(PatientRecordsInitializer.class);
+
+    @Autowired
+    private PatientHistoryRepository patientRecordsRepository;
 
     @Autowired
     private PatientRepository patientRepository;
@@ -69,10 +73,21 @@ public class PatientRecordsInitializer implements CommandLineRunner {
         Arrays.asList("Amlodipine 5mg", "Losartan 50mg")
     );
 
+    private final Random random = new Random();
+
     @Override
-    public void run(String... args) {
-        System.out.println("Initializing patient records...");
-        
+    protected String getInitializerName() {
+        return "PatientRecordsInitializer";
+    }
+
+    @Override
+    protected void initialize() {
+        if (patientRecordsRepository.count() == 0) {
+            createPatientRecords();
+        }
+    }
+
+    private void createPatientRecords() {
         List<Patient> patients = patientRepository.findAll();
         for (Patient patient : patients) {
             // Check if patient already has medical history
@@ -90,8 +105,6 @@ public class PatientRecordsInitializer implements CommandLineRunner {
                 createInitialAppointment(patient);
             }
         }
-        
-        System.out.println("Patient records initialization completed.");
     }
 
     private void createInitialMedicalHistory(Patient patient) {
@@ -109,7 +122,7 @@ public class PatientRecordsInitializer implements CommandLineRunner {
     }
 
     private void createInitialPrescription(Patient patient) {
-        int index = (int) (Math.random() * COMMON_SYMPTOMS.size());
+        int index = (int) (random.nextDouble() * COMMON_SYMPTOMS.size());
         
         Prescription prescription = new Prescription();
         prescription.setPatient(patient);
@@ -152,6 +165,6 @@ public class PatientRecordsInitializer implements CommandLineRunner {
 
     private String getRandomBloodType() {
         String[] bloodTypes = {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"};
-        return bloodTypes[(int) (Math.random() * bloodTypes.length)];
+        return bloodTypes[(int) (random.nextDouble() * bloodTypes.length)];
     }
 }

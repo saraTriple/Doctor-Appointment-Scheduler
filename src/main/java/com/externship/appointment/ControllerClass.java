@@ -46,8 +46,6 @@ public class ControllerClass {
     AppointmentService appointmentService;
     @Autowired
     AdminRepository adminRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
 
     @GetMapping("/register")

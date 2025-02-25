@@ -1,26 +1,49 @@
 package com.externship.appointment.initializers;
 
-
 import com.externship.appointment.Doctor_storage.Doctor;
 import com.externship.appointment.Doctor_storage.DoctorRepository;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Component
-@Order(3)
-public class DoctorDataInitializer implements CommandLineRunner {
+@Order(2)
+public class DoctorDataInitializer extends BaseInitializer {
 
-    private final DoctorRepository doctorRepository;
+    @Autowired
+    private DoctorRepository doctorRepository;
 
-    public DoctorDataInitializer(DoctorRepository doctorRepository) {
-        this.doctorRepository = doctorRepository;
+
+    private final Random random = new Random();
+
+    private static final List<String> SPECIALIZATIONS = Arrays.asList(
+        "Cardiologist", "Neurologist", "Pediatrician", "Dermatologist",
+        "Orthopedist", "Psychiatrist", "Gynecologist", "Ophthalmologist"
+    );
+
+
+    @Override
+    protected String getInitializerName() {
+        return "DoctorDataInitializer";
     }
 
     @Override
-    public void run(String... args) {
-        if (doctorRepository.count() <  100) { // Insert only if empty
+    protected void initialize() {
+        if (!initializationTracker.isInitialized(getInitializerName())) {
+            if (doctorRepository.count() < 100) {
+                createDoctors();
+            }
+            initializationTracker.markAsInitialized(getInitializerName());
+        }
+    }
+
+    public void createDoctors() {
+        if (doctorRepository.count() < 100) { // Insert only if empty
             List<Doctor> doctors = List.of(
                     new Doctor("dr.john@example.com", "Dr. John Doe", "Cardiologist", "MD", "California", "Los Angeles", "pass123"),
                     new Doctor("dr.smith@example.com", "Dr. Alice Smith", "Neurologist", "PhD", "Texas", "Houston", "pass123"),
@@ -48,4 +71,5 @@ public class DoctorDataInitializer implements CommandLineRunner {
             System.out.println("Inserted 20 doctors into the database.");
         }
     }
+
 }

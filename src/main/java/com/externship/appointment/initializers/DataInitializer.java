@@ -5,9 +5,7 @@ import com.externship.appointment.Doctor_storage.DoctorRepository;
 import com.externship.appointment.Patient_storage.Patient;
 import com.externship.appointment.Patient_storage.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -15,7 +13,7 @@ import java.util.List;
 
 @Component
 @Order(1)
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializer extends BaseInitializer {
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -23,8 +21,6 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private PatientRepository patientRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     private static final List<String> PERSIAN_FIRST_NAMES = Arrays.asList(
         "Ali", "Mohammad", "Hossein", "Reza", "Amir", "Mehdi", "Sara", "Fateme", "Zahra", "Maryam",
@@ -42,7 +38,12 @@ public class DataInitializer implements CommandLineRunner {
     );
 
     @Override
-    public void run(String... args) {
+    protected String getInitializerName() {
+        return "DataInitializer";
+    }
+
+    @Override
+    protected void initialize() {
         if (doctorRepository.count() == 0) {
             createDoctors();
         }
@@ -50,7 +51,6 @@ public class DataInitializer implements CommandLineRunner {
             createPatients();
         }
     }
-
 
     private void createDoctors() {
         for (int i = 0; i < 10; i++) {
