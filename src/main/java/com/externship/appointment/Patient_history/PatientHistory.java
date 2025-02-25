@@ -2,6 +2,7 @@ package com.externship.appointment.Patient_history;
 
 import com.externship.appointment.Patient_storage.Patient;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -12,7 +13,7 @@ public class PatientHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "patient_id", nullable = false)
+    @JoinColumn(name = "patient_email", referencedColumnName = "email", nullable = false)
     private Patient patient;
 
     private LocalDate recordDate;
@@ -31,9 +32,9 @@ public class PatientHistory {
     
     private String bloodType;
     
-    private Double weight;
+    private BigDecimal weight;
     
-    private Double height;
+    private BigDecimal height;
     
     @Column(length = 1000)
     private String chronicConditions;
@@ -66,11 +67,11 @@ public class PatientHistory {
     public String getBloodType() { return bloodType; }
     public void setBloodType(String bloodType) { this.bloodType = bloodType; }
     
-    public Double getWeight() { return weight; }
-    public void setWeight(Double weight) { this.weight = weight; }
+    public BigDecimal getWeight() { return weight; }
+    public void setWeight(BigDecimal weight) { this.weight = weight; }
     
-    public Double getHeight() { return height; }
-    public void setHeight(Double height) { this.height = height; }
+    public BigDecimal getHeight() { return height; }
+    public void setHeight(BigDecimal height) { this.height = height; }
     
     public String getChronicConditions() { return chronicConditions; }
     public void setChronicConditions(String chronicConditions) { this.chronicConditions = chronicConditions; }

@@ -108,7 +108,7 @@
 
             <!-- Prescriptions Tab -->
             <div class="tab-pane fade" id="pills-prescriptions" role="tabpanel">
-                <div th:if="${prescriptions.empty}" class="alert alert-info">
+                <div th:if="${#lists.isEmpty(prescriptions)}" class="alert alert-info">
                     No prescriptions found for this patient.
                 </div>
                 <div th:each="prescription : ${prescriptions}" class="medical-record">

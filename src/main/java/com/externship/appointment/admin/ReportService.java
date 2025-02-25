@@ -53,7 +53,13 @@ public class ReportService {
                 for (Map.Entry<Doctor, List<Appointment>> entry : doctorAppointments.entrySet()) {
                     Doctor doctor = entry.getKey();
                     List<Appointment> doctorAppts = entry.getValue();
-                    double totalIncome = doctorAppts.stream().mapToDouble(Appointment::getPrice).sum();
+                    double totalIncome = doctorAppts.stream().mapToDouble(apm -> {
+                        if (apm.getPrice() == null) {
+                            return 0;
+                        } else {
+                            return apm.getPrice().doubleValue();
+                        }
+                    }).sum();
 
                     table.addCell(doctor.getName());
                     table.addCell(doctor.getSpecialization());
@@ -67,13 +73,13 @@ public class ReportService {
             } else {
                 Workbook workbook = new XSSFWorkbook();
                 Sheet sheet = workbook.createSheet("Income Report");
-                
+
                 // Create cell styles
                 CellStyle headerStyle = workbook.createCellStyle();
                 Font headerFont = workbook.createFont();
                 headerFont.setBold(true);
                 headerStyle.setFont(headerFont);
-                
+
                 CellStyle currencyStyle = workbook.createCellStyle();
                 currencyStyle.setDataFormat(workbook.createDataFormat().getFormat("$#,##0.00"));
 
@@ -82,15 +88,15 @@ public class ReportService {
                 Cell cell0 = headerRow.createCell(0);
                 cell0.setCellValue("Doctor");
                 cell0.setCellStyle(headerStyle);
-                
+
                 Cell cell1 = headerRow.createCell(1);
                 cell1.setCellValue("Specialty");
                 cell1.setCellStyle(headerStyle);
-                
+
                 Cell cell2 = headerRow.createCell(2);
                 cell2.setCellValue("Appointments");
                 cell2.setCellStyle(headerStyle);
-                
+
                 Cell cell3 = headerRow.createCell(3);
                 cell3.setCellValue("Total Income");
                 cell3.setCellStyle(headerStyle);
@@ -103,7 +109,13 @@ public class ReportService {
                 for (Map.Entry<Doctor, List<Appointment>> entry : doctorAppointments.entrySet()) {
                     Doctor doctor = entry.getKey();
                     List<Appointment> doctorAppts = entry.getValue();
-                    double totalIncome = doctorAppts.stream().mapToDouble(Appointment::getPrice).sum();
+                    double totalIncome = doctorAppts.stream().mapToDouble(apm -> {
+                        if (apm.getPrice() == null) {
+                            return 0;
+                        } else {
+                            return apm.getPrice().doubleValue();
+                        }
+                    }).sum();
 
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(doctor.getName());
@@ -293,7 +305,7 @@ public class ReportService {
                 document.open();
 
                 // Add title
-                com.itextpdf.text.Font titleFont= FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+                com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
                 Paragraph title = new Paragraph("Specialty Analysis Report", titleFont);
                 title.setAlignment(Element.ALIGN_CENTER);
                 document.add(title);
@@ -353,7 +365,7 @@ public class ReportService {
     public byte[] generateTimeSlotReport(Map<LocalTime, Long> timeSlotCounts, LocalDate startDate, LocalDate endDate, String format) {
         try {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-            
+
             if (!"xlsx".equalsIgnoreCase(format)) {
                 Document document = new Document();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -379,7 +391,7 @@ public class ReportService {
                 // Sort time slots
                 List<Map.Entry<LocalTime, Long>> sortedEntries = new ArrayList<>(timeSlotCounts.entrySet());
                 sortedEntries.sort(Map.Entry.comparingByKey());
-                
+
                 for (Map.Entry<LocalTime, Long> entry : sortedEntries) {
                     table.addCell(entry.getKey().format(timeFormatter));
                     table.addCell(String.valueOf(entry.getValue()));
@@ -404,7 +416,7 @@ public class ReportService {
                 // Sort time slots
                 List<Map.Entry<LocalTime, Long>> sortedEntries = new ArrayList<>(timeSlotCounts.entrySet());
                 sortedEntries.sort(Map.Entry.comparingByKey());
-                
+
                 for (Map.Entry<LocalTime, Long> entry : sortedEntries) {
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(entry.getKey().format(timeFormatter));

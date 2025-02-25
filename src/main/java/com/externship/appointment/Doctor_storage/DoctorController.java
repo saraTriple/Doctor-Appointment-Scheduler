@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -106,19 +107,19 @@ public class DoctorController {
             return "redirect:/doclog";
         }
 
-        Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
+        List<Appointment> appointmentOpt = appointmentRepository.findByIdList(id);
         if (appointmentOpt.isEmpty()) {
             return "redirect:/doctor/appointments";
         }
 
-        Appointment appointment = appointmentOpt.get();
+        Appointment appointment = appointmentOpt.get(0);
         model.addAttribute("appointment", appointment);
 
         if (appointment.getPerson() != null) {
             List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(appointment.getPerson());
             model.addAttribute("patientHistory", patientHistory);
 
-            List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(appointment.getPerson().getId());
+            List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(appointment.getPerson().getEmail());
             model.addAttribute("prescriptions", prescriptions);
         }
 
@@ -214,8 +215,8 @@ public class DoctorController {
 
         // Add optional medical history fields
         if (bloodType != null && !bloodType.isEmpty()) history.setBloodType(bloodType);
-        if (weight != null) history.setWeight(weight);
-        if (height != null) history.setHeight(height);
+        if (weight != null) history.setWeight(BigDecimal.valueOf(weight));
+        if (height != null) history.setHeight(BigDecimal.valueOf(height));
         if (allergies != null && !allergies.isEmpty()) history.setAllergies(allergies);
         if (chronicConditions != null && !chronicConditions.isEmpty()) history.setChronicConditions(chronicConditions);
         if (familyHistory != null && !familyHistory.isEmpty()) history.setFamilyHistory(familyHistory);
@@ -246,7 +247,7 @@ public class DoctorController {
         List<PatientHistory> patientHistory = patientHistoryRepository.findByPatientOrderByRecordDateDesc(patient.get());
 
         // Get patient's prescriptions
-        List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(patient.get().getId());
+        List<Prescription> prescriptions = prescriptionRepository.findByPatientOrderByDateDesc(patient.get().getEmail());
 
         // Get patient's appointments
         List<Appointment> appointments = appointmentRepository.findByPerson_Email(patient.get().getEmail());

@@ -15,6 +15,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -200,7 +201,7 @@ public class PatientHistoryDataInitializer extends BaseInitializer {
         appointment.setDate(date);
         appointment.setTime(time);
         appointment.setAppointmentStatus(status);
-        appointment.setPrice(80.0 + new Random().nextInt(421)); // Random price between 80 and 500
+        appointment.setPrice(BigDecimal.valueOf(80.0 + new Random().nextInt(421))); // Random price between 80 and 500
         appointmentRepository.save(appointment);
     }
 
@@ -241,8 +242,8 @@ public class PatientHistoryDataInitializer extends BaseInitializer {
         history.setMedications(medications);
         history.setAllergies(allergies);
         history.setBloodType(bloodType);
-        history.setWeight(weight);
-        history.setHeight(height);
+        history.setWeight(BigDecimal.valueOf(weight));
+        history.setHeight(BigDecimal.valueOf(height));
         history.setChronicConditions(chronicConditions);
         history.setFamilyHistory(familyHistory);
         historyRepository.save(history);

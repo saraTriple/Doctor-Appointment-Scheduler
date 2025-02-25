@@ -13,9 +13,10 @@ public abstract class BaseInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!initializationTracker.isInitialized(getInitializerName())) {
-            initialize();
-            initializationTracker.markAsInitialized(getInitializerName());
-        }
+//        if (!initializationTracker.isInitialized(getInitializerName())) {
+//            initialize();
+//            initializationTracker.markAsInitialized(getInitializerName());
+//        }
+        return;
     }
 }

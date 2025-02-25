@@ -15,10 +15,6 @@ import java.util.List;
 public class Patient {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate ID
-	private Long id; // Primary key
-
-	@Column(nullable = false)
 	private String email;
 
 	@Column(nullable = false)
@@ -69,14 +65,6 @@ public class Patient {
 	}
 
 	// Getters and Setters
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -176,8 +164,7 @@ public class Patient {
 	@Override
 	public String toString() {
 		return "Patient{" +
-				"id=" + id +
-				", email='" + email + '\'' +
+				"email='" + email + '\'' +
 				", password='" + password + '\'' +
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +

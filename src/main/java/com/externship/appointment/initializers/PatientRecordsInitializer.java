@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -96,7 +97,7 @@ public class PatientRecordsInitializer extends BaseInitializer {
             }
 
             // Check if patient already has prescriptions
-            if (prescriptionRepository.findByPatientOrderByDateDesc(patient.getId()).isEmpty()) {
+            if (prescriptionRepository.findByPatientOrderByDateDesc(patient.getEmail()).isEmpty()) {
                 createInitialPrescription(patient);
             }
 
@@ -111,8 +112,8 @@ public class PatientRecordsInitializer extends BaseInitializer {
         PatientHistory history = new PatientHistory();
         history.setPatient(patient);
         history.setBloodType(getRandomBloodType());
-        history.setWeight(70.0);
-        history.setHeight(170.0);
+        history.setWeight(BigDecimal.valueOf(70.0));
+        history.setHeight(BigDecimal.valueOf(170.0));
         history.setAllergies("No known allergies");
         history.setRecordDate(LocalDate.now());
         history.setFamilyHistory("No significant family history");
@@ -136,7 +137,7 @@ public class PatientRecordsInitializer extends BaseInitializer {
         if (prescription.getPatient() == null) {
             logger.warn("Prescription is being saved with a null patient. Prescription ID: " + prescription.getId());
         } else {
-            logger.info("Saving Prescription for Patient: " + prescription.getPatient().getId());
+            logger.info("Saving Prescription for Patient: " + prescription.getPatient().getEmail());
         }
 
         prescriptionRepository.save(prescription);
@@ -154,7 +155,7 @@ public class PatientRecordsInitializer extends BaseInitializer {
             appointment.setTime(LocalTime.of(10, 0));
             AppointmentStatus scheduledStatus = appointmentStatusRepository.findById("SCHEDULED").get();
             appointment.setAppointmentStatus(scheduledStatus);
-            appointment.setPrice(10.0);
+            appointment.setPrice(BigDecimal.valueOf(10.0));
 
             appointmentRepository.save(appointment);
             System.out.println("Created initial appointment for patient: " + patient.getEmail());

@@ -20,6 +20,9 @@ import java.util.Optional;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
+
+    @Query("select a from Appointment a where a.id = :id")
+    List<Appointment> findByIdList(Long id);
     /**
      * Finds an appointment by date, time, and doctor's email.
      *
@@ -149,16 +152,19 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
      * @return a page of appointments matching the specified filters
      */
     @Query("SELECT a FROM Appointment a WHERE " +
-           "a.date >= :currentDate AND " +
-            ":filteredDate is null or a.date = :filteredDate And " +
-           "a.person IS NULL AND " +
-           "(:specialty IS NULL OR LOWER(a.doctor.specialization) LIKE LOWER(CONCAT('%', :specialty, '%'))) AND " +
-           "(:doctorName IS NULL OR LOWER(a.doctor.name) LIKE LOWER(CONCAT('%', :doctorName, '%')))")
+            "(CAST(:currentDate AS date) IS NULL OR a.date >= CAST(:currentDate AS date)) AND " +
+            "(CAST(:filteredDate AS date) IS NULL OR a.date = CAST(:filteredDate AS date)) AND " +
+            "a.person IS NULL AND " +
+            "(CAST(:specialty AS string) IS NULL OR LOWER(a.doctor.specialization) LIKE LOWER(CONCAT('%', CAST(:specialty AS string), '%'))) AND " +
+            "(CAST(:doctorName AS string) IS NULL OR LOWER(a.doctor.name) LIKE LOWER(CONCAT('%', CAST(:doctorName AS string), '%')))")
     Page<Appointment> findByFilters(
             @Param("currentDate") LocalDate currentDate,
             @Param("filteredDate") LocalDate filteredDate,
             @Param("specialty") String specialty,
             @Param("doctorName") String doctorName,
             Pageable pageable);
+
+
+
     Page<Appointment> findByDateAndTime(LocalDate filterDate, LocalTime filterTime, Pageable pageable);
 }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +56,16 @@ public class AppointmentService {
 
     public double calculateTotalRevenue() {
         List<Appointment> appointments = appointmentRepository.findAll();
-        return appointments.stream()
+
+        List<BigDecimal> completed = appointments.stream()
                 .filter(appointment -> appointment.getAppointmentStatus().getStatus().equals("COMPLETED"))
-                .mapToDouble(Appointment::getPrice)
-                .sum();
+                .map(Appointment::getPrice).collect(Collectors.toList());
+        int sum = 0;
+
+        for (BigDecimal c: completed) {
+            sum += c.intValue();
+        }
+        return sum;
     }
 
     public Map<String, Long> getAppointmentStatusCounts() {
@@ -81,21 +88,21 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
-    public List<Double> getRevenueData() {
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(30); // Last 30 days
-
-        List<Appointment> completedAppointments = appointmentRepository.findByAppointmentStatus_StatusAndDateBetween(
-                "COMPLETED", startDate, endDate);
-
-        Map<String, Double> dailyRevenue = completedAppointments.stream()
-                .collect(Collectors.groupingBy(
-                        appointment -> appointment.getDate().toString(),
-                        Collectors.summingDouble(Appointment::getPrice)
-                ));
-
-        return getRevenueDates().stream()
-                .map(date -> dailyRevenue.getOrDefault(date, 0.0))
-                .collect(Collectors.toList());
-    }
+//    public List<Double> getRevenueData() {
+//        LocalDate endDate = LocalDate.now();
+//        LocalDate startDate = endDate.minusDays(30); // Last 30 days
+//
+//        List<Appointment> completedAppointments = appointmentRepository.findByAppointmentStatus_StatusAndDateBetween(
+//                "COMPLETED", startDate, endDate);
+//
+//        Map<String, Double> dailyRevenue = completedAppointments.stream()
+//                .collect(Collectors.groupingBy(
+//                        appointment -> appointment,
+//                        Collectors.summingDouble(Appointment::getPrice)
+//                ));
+//
+//        return getRevenueDates().stream()
+//                .map(date -> dailyRevenue.getOrDefault(date, 0.0))
+//                .collect(Collectors.toList());
+//    }
 }

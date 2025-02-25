@@ -16,7 +16,7 @@ public class Doctor {
 	private String email;
 	private String name;
 	private String specialization;
-	private String degree;
+	private String qualification;
 	private String state;
 	private String city;
 	
@@ -25,11 +25,11 @@ public class Doctor {
 	public Doctor() {
 	}
 
-	public Doctor(String email, String name, String specialization, String degree, String state, String city, String password) {
+	public Doctor(String email, String name, String specialization, String qualification, String state, String city, String password) {
 		this.email = email;
 		this.name = name;
 		this.specialization = specialization;
-		this.degree = degree;
+		this.qualification = qualification;
 		this.state = state;
 		this.city = city;
 		this.password = password;
@@ -67,11 +67,11 @@ public class Doctor {
 	public void setState(String state) {
 		this.state = state;
 	}
-	public String getDegree() {
-		return degree;
+	public String getQualification() {
+		return qualification;
 	}
-	public void setDegree(String degree) {
-		this.degree = degree;
+	public void setQualification(String qualification) {
+		this.qualification = qualification;
 	}
 	public String getCity() {
 		return city;

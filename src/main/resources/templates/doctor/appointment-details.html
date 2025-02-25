@@ -84,7 +84,7 @@
                         <h5 class="mb-0"><i class="fas fa-history"></i> Patient Medical History</h5>
                     </div>
                     <div class="card-body">
-                        <div th:if="${patientHistory.empty}" class="alert alert-info">
+                        <div th:if="${#lists.isEmpty(patientHistory)}" class="alert alert-info">
                             No medical history records found for this patient.
                         </div>
                         <div th:each="history : ${patientHistory}" class="medical-record">
@@ -118,7 +118,7 @@
                         <h5 class="mb-0"><i class="fas fa-file-medical"></i> Prescription History</h5>
                     </div>
                     <div class="card-body">
-                        <div th:if="${prescriptions.empty}" class="alert alert-info">
+                        <div th:if="${#lists.isEmpty(prescriptions)}" class="alert alert-info">
                             No prescription history found for this patient.
                         </div>
                         <div th:each="prescription : ${prescriptions}" class="medical-record">

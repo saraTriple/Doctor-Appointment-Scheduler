@@ -5,8 +5,10 @@ import com.externship.appointment.Patient_storage.Patient;
 import com.externship.appointment.Prescription_storage.Prescription;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 public class Appointment {
@@ -20,21 +22,21 @@ public class Appointment {
 	@Column(name = "time")
 	private LocalTime time;
 
-	private double price;
+	private BigDecimal price;
 
 	@ManyToOne
-	@JoinColumn(name = "patient_id", nullable = true)  // Foreign key to Person
+	@JoinColumn(name = "patient_email", referencedColumnName = "email", nullable = true)  // Foreign key to Patient's email
 	private Patient person;
 
 	@ManyToOne
-	@JoinColumn(name = "doctor_email", nullable = false)  // Foreign key to Doctor
+	@JoinColumn(name = "doctor_email", referencedColumnName = "email", nullable = false)  // Foreign key to Doctor's email
 	private Doctor doctor;
 
-	@OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Prescription prescription;
+	@OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Prescription> prescriptions;
 
 	@ManyToOne
-	@JoinColumn(name = "status_id", nullable = false)  // Foreign key to AppointmentStatus
+	@JoinColumn(name = "status", nullable = false)  // Foreign key to AppointmentStatus
 	private AppointmentStatus appointmentStatus;
 
 	// Getters and Setters
@@ -62,11 +64,11 @@ public class Appointment {
 		this.time = time;
 	}
 
-	public double getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 
@@ -86,12 +88,12 @@ public class Appointment {
 		this.doctor = doctor;
 	}
 
-	public Prescription getPrescription() {
-		return prescription;
+	public List<Prescription> getPrescriptions() {
+		return prescriptions;
 	}
 
-	public void setPrescription(Prescription prescription) {
-		this.prescription = prescription;
+	public void setPrescriptions(List<Prescription> prescription) {
+		this.prescriptions = prescription;
 	}
 
 	public AppointmentStatus getAppointmentStatus() {

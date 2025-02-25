@@ -146,7 +146,7 @@
                     <td th:text="${#temporals.format(appointment.date, 'dd-MM-yyyy')}"></td>
                     <td th:text="${appointment.time}"></td>
                     <td th:text="${appointment.doctor.name }"></td>
-                    <td th:text="${appointment.person.firstName + ' ' + appointment.person.lastName}"></td>
+                    <td th:text="${appointment.person != null ? appointment.person.firstName + ' ' + appointment.person.lastName : 'Not Assigned'}"></td>
                     <td>
                         <span th:class="${'badge ' + 
                             (appointment.appointmentStatus.status == 'SCHEDULED' ? 'badge-primary' :

@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface PrescriptionRepository extends JpaRepository<Prescription, Long> {
     Optional<Prescription> findByAppointment(Appointment appointment);
     
-    @Query("SELECT p FROM Prescription p WHERE p.patient.id = :patientId ORDER BY p.prescriptionDate DESC")
-    List<Prescription> findByPatientOrderByDateDesc(Long patientId);
+    @Query("SELECT p FROM Prescription p WHERE p.patient.email = :patientId ORDER BY p.prescriptionDate DESC")
+    List<Prescription> findByPatientOrderByDateDesc(String patientId);
 }

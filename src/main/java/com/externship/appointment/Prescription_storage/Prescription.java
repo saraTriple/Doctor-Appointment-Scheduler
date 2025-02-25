@@ -7,17 +7,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "prescriptions")
+@Table(name = "prescription")
 public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", nullable = false)
+    @JoinColumn(name = "patient_email", referencedColumnName = "email", nullable = false)
     private Patient patient;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "appointment_id", nullable = true)
     private Appointment appointment;
 
